@@ -1,0 +1,57 @@
+{
+  "common": {
+    "createPost": "Tạo bài viết",
+    "editPost": "Chỉnh sửa bài viết",
+    "deletePost": "Xóa bài viết",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "title": "Tiêu đề",
+    "content": "Nội dung",
+    "author": "Tác giả",
+    "actions": "Hành động",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "noPosts": "Không có bài viết nào",
+    "noPostsFound": "Không tìm thấy bài viết nào",
+    "deletePostConfirmation": "Bạn có chắc chắn muốn xóa bài viết này không?",
+    "yes": "Có",
+    "no": "Không",
+    "scheduled": "Đã lên lịch",
+    "published": "Đã xuất bản",
+    "draft": "Bản nháp",
+    "status": "Trạng thái",
+    "date": "Ngày",
+    "schedule": "Lên lịch",
+    "en": "Tiếng Anh",
+    "vi": "Tiếng Việt",
+    "label": "Chọn ngôn ngữ",
+    "more": "Xem thêm"
+  },
+  "sidebar": {
+    "platform": "Nền tảng",
+    "schedules": "Lên lịch",
+    "posts": "Bài viết",
+    "settings": "Cài đặt",
+    "connect": "Kết nối tài khoản",
+    "subscription": "Nâng cấp tài khoản",
+    "facebook": "Facebook",
+    "threads": "Threads",
+    "reddit": "Reddit"
+  },
+  "connect": {
+    "title": "Kết nối các nền tảng",
+    "description": "Kết nối các nền tảng xã hội để quản lý bài viết của bạn",
+    "noConnectedPlatform": "Không có tài khoản nào được kết nối. Nhấn vào nút ở trên để kết nối tài khoản.",
+    "connectAccount": "Kết nối tài khoản"
+  },
+  "subscription": {
+    "title": "Bảng giá",
+    "description": "Chọn gói dịch vụ phù hợp với nhu cầu của bạn",
+    "free": "Miễn phí",
+    "standard": "Tiêu chuẩn",
+    "premium": "Cao cấp",
+    "subscribe": "Đăng ký",
+    "monthly": "Hàng tháng",
+    "yearly": "Hàng năm"
+  }
+}

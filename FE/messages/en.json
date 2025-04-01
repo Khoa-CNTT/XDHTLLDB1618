@@ -1,0 +1,56 @@
+{
+  "common": {
+    "createPost": "Create Post",
+    "editPost": "Edit Post",
+    "deletePost": "Delete Post",
+    "cancel": "Cancel",
+    "save": "Save",
+    "title": "Title",
+    "content": "Content",
+    "author": "Author",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noPosts": "No posts available",
+    "noPostsFound": "No posts found",
+    "deletePostConfirmation": "Are you sure you want to delete this post?",
+    "yes": "Yes",
+    "no": "No",
+    "scheduled": "Scheduled",
+    "published": "Published",
+    "draft": "Draft",
+    "status": "Status",
+    "date": "Date",
+    "en": "English",
+    "vi": "Vietnamese",
+    "label": "Select a language",
+    "more": "More"
+  },
+  "sidebar": {
+    "platform": "Platform",
+    "schedules": "Schedules",
+    "posts": "Posts",
+    "settings": "Settings",
+    "connect": "Connect",
+    "subscription": "Subscriptions",
+    "facebook": "Facebook",
+    "threads": "Threads",
+    "reddit": "Reddit"
+  },
+  "connect": {
+    "title": "Connect Platforms",
+    "description": "Connect social platforms to manage your posts",
+    "noConnectedPlatform": "No accounts connected. Click the button above to connect an account.",
+    "connectAccount": "Connect Account"
+  },
+  "subscription": {
+    "title": "Pricing",
+    "description": "Choose a plan that fits your needs",
+    "free": "Free",
+    "standard": "Standard",
+    "premium": "Premium",
+    "subscribe": "Subscribe",
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  }
+}
