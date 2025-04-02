@@ -33,7 +33,7 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
 
   const { data: posts } = useGetPosts()
 
-  const events = posts?.data.map((post) => ({
+  const events = posts?.data.data.map((post) => ({
     ...post,
     start: moment(post.publicationTime).toDate(),
     end: moment(post.publicationTime).toDate(),

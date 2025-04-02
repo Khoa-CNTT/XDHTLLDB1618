@@ -4,7 +4,7 @@ const configs = {
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL as string,
   supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_KEY as string,
   fbAppId: (process.env.NEXT_PUBLIC_FACEBOOK_APP_ID as string) || '',
-  fbAppVer: (process.env.NEXT_PUBLIC_FACEBOOK_VERSION as string) || 'v21.0',
+  fbAppVer: (process.env.NEXT_PUBLIC_FACEBOOK_VERSION as string) || 'v22.0',
   redditAppId: (process.env.NEXT_PUBLIC_REDDIT_ID as string) || '',
   redditSecret: (process.env.NEXT_PUBLIC_REDDIT_SECRET as string) || '',
   returnUrl: (process.env.NEXT_PUBLIC_RETURN_URL as string) || '',

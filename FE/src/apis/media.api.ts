@@ -1,30 +1,23 @@
-import supabase from '@/configs/supabase'
+import http from '@/utils/http'
+import axios from 'axios'
 import moment from 'moment'
 
-import { Credential } from '@/types/credentials'
+import { UploadImageResponse } from '@/types/media'
+import { SuccessResponse } from '@/types/utils'
+
+const MEDIA_URI = '/media'
 
 const mediaApis = {
-  handleUploadImages: async (files: File[], credential: Credential) => {
-    const now = moment().format('YYYY-MM-DD')
-
-    const uploadPromises = files.map(async (file) => {
-      const { data, error } = await supabase.storage
-        .from('facebook')
-        .upload(`${credential.credential.page_id}/${now}_${file.name}`, file, {
-          cacheControl: '3600'
-        })
-
-      if (error) {
-        console.error('Error uploading image:', error)
-        return null
-      }
-
-      return data?.path
+  handleUploadImages: async (files: File[]) => {
+    const formData = new FormData()
+    files.forEach((file) => {
+      formData.append('images', file)
     })
-
-    const uploadedPaths = await Promise.all(uploadPromises)
-
-    return uploadedPaths.filter((path) => path !== null)
+    return http.post<SuccessResponse<UploadImageResponse[]>>(`${MEDIA_URI}/upload-image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
   }
 }
 

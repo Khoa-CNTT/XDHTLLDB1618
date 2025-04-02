@@ -1,21 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type Credential = {
   id: string
   ownerID: string
   platform: string
-  credential: {
-    page_id: string
-    page_name: string
-    threads_profile_picture_url?: string
-    username?: string
+  socialId: string
+  credentials: {
+    [key: string]: string
   }
   metadata: {
-    page_id: string
-    page_name: string
-    fan_count: number
-    picture: {
-      height: number
-      width: number
-      url: string
-    }
+    avatar_url: string
+    name: string
+    [key: string]: any
   }
 }

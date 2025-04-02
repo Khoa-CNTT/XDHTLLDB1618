@@ -56,7 +56,7 @@ export default function FacebookSdk({ refetch, btnText }: Props) {
 
   const getPages = () => {
     return new Promise<any>((resolve, reject) => {
-      window.FB.api('/me/accounts', (response: any) => {
+      window.FB.api('me/accounts?fields=id,name,picture,access_token,fan_count', (response: any) => {
         if (response && !response.error) {
           resolve(response)
         } else {
@@ -70,13 +70,29 @@ export default function FacebookSdk({ refetch, btnText }: Props) {
     if (window.FB) {
       window.FB.login(
         (response: any) => {
-          console.log('res: ', response)
           if (response.authResponse) {
+            const authResponse = response.authResponse
             getPages()
               .then(async (response) => {
                 const pageData = response.data
-                console.log('pageData: ', pageData)
-
+                if (pageData.length > 0) {
+                  const body = pageData.map((item: any) => ({
+                    platform: 'facebook',
+                    socialOwnerId: authResponse.userID,
+                    socialId: item.id,
+                    credentials: {
+                      page_id: item.id,
+                      code: item.access_token
+                    },
+                    metadata: {
+                      avatar_url: item.picture.data.url,
+                      name: item.name,
+                      fan_count: item.fan_count
+                    }
+                  }))
+                  await credentialApi.connectSocialAccount(body)
+                  refetch()
+                }
                 console.log('Good to see you, ' + response.name + '.')
               })
               .catch((error) => {

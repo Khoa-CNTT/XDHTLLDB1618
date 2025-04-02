@@ -17,7 +17,7 @@ export default function Threads() {
     await credentialApi.connectSocialAccount([
       {
         platform: 'threads',
-        credential: {
+        credentials: {
           code,
           redirectURI: `${configs.returnUrl}/connect?platform=threads`
         }

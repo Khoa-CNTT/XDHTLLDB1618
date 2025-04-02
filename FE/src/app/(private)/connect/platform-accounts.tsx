@@ -68,8 +68,8 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
           </div>
         ) : (
           <div className='space-y-4'>
-            {credentials?.data && credentials.data.length > 0 ? (
-              credentials?.data?.map((account) => (
+            {credentials?.data.data && credentials.data.data.length > 0 ? (
+              credentials?.data?.data.map((account) => (
                 <div
                   key={account.id}
                   className='flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border p-4 gap-1'
@@ -77,17 +77,17 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
                   <div className='flex items-center gap-4'>
                     {/* INFO: BE do not return avatar yet */}
                     <Avatar className='size-12 border'>
-                      <AvatarImage src={account.credential?.threads_profile_picture_url} />
-                      <AvatarFallback>{account?.credential?.page_name?.[0] ?? ''}</AvatarFallback>
+                      <AvatarImage src={account.metadata.avatar_url} />
+                      <AvatarFallback>{account.metadata.name.charAt(0) ?? ''}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h4 className='font-semibold'>{account.credential.page_name || account.credential.username}</h4>
-                      <p className='text-sm text-muted-foreground'>{account?.metadata?.fan_count ?? 0}</p>
+                      <h4 className='font-semibold'>{account.metadata.name}</h4>
+                      <p className='text-sm text-muted-foreground'>{account.metadata.fan_count}</p>
                     </div>
                   </div>
                   <div className='flex items-center gap-2 ml-auto'>
                     {/* TODO: replace by url link */}
-                    <Link href={account.credential.page_name || '#'}>
+                    <Link href={account.metadata.name || '#'}>
                       <ExternalLink />
                     </Link>
                     <Button variant='destructive' onClick={() => handleDisconnect(account.id)}>

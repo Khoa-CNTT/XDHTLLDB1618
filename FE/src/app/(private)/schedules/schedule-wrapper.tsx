@@ -11,7 +11,7 @@ export default async function ScheduleWrapper() {
   let credentials: Credential[] = []
 
   // don't use try catch here, it made redirect function not work
-  credentials = (await credentialApi.getCredential(accessToken)).data ?? []
+  credentials = (await credentialApi.getCredential(accessToken)).data.data ?? []
 
   return <Schedule credentials={credentials} />
 }

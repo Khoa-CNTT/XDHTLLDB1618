@@ -2,12 +2,13 @@ import { PlatformType } from '@/constants/credentials'
 import http from '@/utils/http'
 
 import { Credential } from '@/types/credentials'
+import { SuccessResponse } from '@/types/utils'
 
 const CREDENTIAL_URI = '/social-credentials'
 
 const credentialApi = {
   getCredential: (accessToken: string) => {
-    return http.get<Credential[]>(CREDENTIAL_URI, {
+    return http.get<SuccessResponse<Credential[]>>(CREDENTIAL_URI, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -15,7 +16,7 @@ const credentialApi = {
   },
 
   getCredentialClient: (platform?: PlatformType) => {
-    return http.get<Credential[]>(CREDENTIAL_URI, {
+    return http.get<SuccessResponse<Credential[]>>(CREDENTIAL_URI, {
       params: {
         platform
       }

@@ -1,10 +1,8 @@
 import mediaApis from '@/apis/media.api'
 import { useMutation } from '@tanstack/react-query'
 
-import { Credential } from '@/types/credentials'
-
-export const useUploadImagesMutation = (credential: Credential) => {
+export const useUploadImagesMutation = () => {
   return useMutation({
-    mutationFn: (data: File[]) => mediaApis.handleUploadImages(data, credential)
+    mutationFn: (data: File[]) => mediaApis.handleUploadImages(data)
   })
 }

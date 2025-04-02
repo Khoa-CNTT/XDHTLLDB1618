@@ -6,3 +6,8 @@ export interface EmojiEvent {
   shortcodes: string
   unified: string
 }
+
+export interface SuccessResponse<Data> {
+  data: Data
+  message: string
+}
