@@ -37,6 +37,11 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --facebook: 24, 119, 242;
+    --threads: 0, 0, 0;
+    --instagram: 253, 126, 20;
+    --reddit: 255, 69, 0;
+    --twitter: 29, 161, 242;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -71,6 +76,11 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --facebook: 0, 132, 255;
+    --threads: 255, 255, 255;
+    --instagram: 255, 146, 0;
+    --reddit: 255, 69, 0;
+    --twitter: 0, 172, 255;
   }
 }
 

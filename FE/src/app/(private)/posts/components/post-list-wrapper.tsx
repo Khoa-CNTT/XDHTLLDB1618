@@ -19,6 +19,7 @@ export default async function PostListWrapper({ platform }: PostListWrapperProps
   const postsPromise = postApi.getPostsServer(accessToken, {
     platform
   })
+
   return (
     <div className='bg-muted h-full'>
       <div className='mx-auto p-4 md:px-10 h-full'>

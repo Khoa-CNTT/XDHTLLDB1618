@@ -24,7 +24,6 @@ export function BreadcrumbMolecules() {
       <BreadcrumbList className='flex-nowrap'>
         {breadcrumbs.map((breadcrumb, index) => {
           const lastBreadcrumbIndex = breadcrumbs.length - 1
-          console.log(breadcrumb.title, 'breadcrumb.title')
 
           return (
             <Fragment key={breadcrumb.title}>

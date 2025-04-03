@@ -99,6 +99,7 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
         components={{
           event: ({ event }) => <EventCard event={event} />
         }}
+        dayLayoutAlgorithm='no-overlap'
       />
 
       <CreatePostModal

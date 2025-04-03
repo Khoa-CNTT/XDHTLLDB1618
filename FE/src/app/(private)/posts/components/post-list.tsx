@@ -4,12 +4,11 @@ import { Fragment, use } from 'react'
 import Link from 'next/link'
 import { FADE_IN_ANIMATION, FADE_IN_STAGGER_ANIMATION, fadeInChildVariants } from '@/constants/effects'
 import { POST_STATUS, PostStatus, PostType } from '@/constants/post'
-import { useUser } from '@clerk/nextjs'
-import { UserResource } from '@clerk/types'
 import { format } from 'date-fns'
 import { Clock, MoreVertical } from 'lucide-react'
 
 import { Post } from '@/types/post'
+import { SuccessResponse } from '@/types/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -26,10 +25,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import ElementEffect from '@/components/effects/element-effect'
 import ElementEffectStagger from '@/components/effects/element-effect-stagger'
 
-export function PostList({ status, postsPromise }: { status: PostStatus; postsPromise: Promise<Post[]> }) {
+export function PostList({
+  status,
+  postsPromise
+}: {
+  status: PostStatus
+  postsPromise: Promise<SuccessResponse<Post[]>>
+}) {
   const posts = use(postsPromise)
-  const scheduledPosts = posts?.filter((post) => post.status === status)
-  const { user } = useUser()
+  const scheduledPosts = posts?.data.filter((post) => post.status === status)
 
   // Group posts by date
   const groupedPosts = scheduledPosts?.reduce(
@@ -40,12 +44,11 @@ export function PostList({ status, postsPromise }: { status: PostStatus; postsPr
         groups[date] = []
       }
       groups[date].push({
-        ...post,
-        user: user as UserResource
+        ...post
       })
       return groups
     },
-    {} as Record<string, (Post & { user: UserResource })[]>
+    {} as Record<string, Post[]>
   )
 
   return (
@@ -99,10 +102,10 @@ export function PostList({ status, postsPromise }: { status: PostStatus; postsPr
                         <TableCell>
                           <div className='flex items-center space-x-2'>
                             <Avatar className='size-8'>
-                              <AvatarImage src={post?.user?.imageUrl} />
-                              <AvatarFallback>{post?.user?.fullName?.[0] ?? ''}</AvatarFallback>
+                              <AvatarImage src={post?.socialCredential.metadata.avatar_url} />
+                              <AvatarFallback>{post?.socialCredential.metadata.name.charAt(0) ?? 'A'}</AvatarFallback>
                             </Avatar>
-                            <span className='text-sm font-medium'>{post?.user?.fullName}</span>
+                            <span className='text-sm font-medium'>{post?.socialCredential.metadata.name}</span>
                           </div>
                         </TableCell>
                         <TableCell>

@@ -1,14 +1,14 @@
 import { PLATFORM_COLORS } from '@/constants'
 
 export const getCustomEventStyle = (platform: string) => {
-  const color = PLATFORM_COLORS[platform.toUpperCase() as keyof typeof PLATFORM_COLORS]
+  const colorVar = PLATFORM_COLORS[platform.toUpperCase() as keyof typeof PLATFORM_COLORS]
   return {
     style: {
-      backgroundColor: `${color}33`,
+      backgroundColor: `rgba(var(${colorVar}), 0.3)`,
       borderRadius: '0.25rem',
       height: '50px !important',
-      borderLeft: `4px solid ${color}`,
-      color: '#000'
+      borderLeft: `4px solid rgb(var(${colorVar}))`,
+      color: 'var(--foreground)'
     }
   }
 }

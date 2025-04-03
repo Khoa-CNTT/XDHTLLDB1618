@@ -1,3 +1,4 @@
+import { get } from 'http'
 import { PLATFORM_TYPE } from '@/constants'
 import http from '@/utils/http'
 
@@ -20,12 +21,15 @@ const postApi = {
     return http.post(`${POST_URI}/schedule`, data)
   },
   getPostsServer(accessToken: string, params?: GetPostsParams) {
-    return http.get<Post[]>(POST_URI, {
+    return http.get<SuccessResponse<Post[]>>(POST_URI, {
       params,
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
     })
+  },
+  getPostByIdServer(id: string) {
+    return http.get<SuccessResponse<Post>>(`${POST_URI}/${id}`)
   }
 }
 

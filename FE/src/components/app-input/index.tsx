@@ -61,6 +61,9 @@ export default function AppInput<T extends FieldValues>({ field }: Props<T>) {
           divRef.current?.classList.remove('border-ring', 'border')
         }}
         className='h-40 border-b-0 rounded-b-none resize-none focus-visible:ring-0 focus-visible:ring-offset-0'
+        style={{
+          scrollbarGutter: 'stable'
+        }}
         onChange={(e) => onContentChange(e.target.value)}
       />
 

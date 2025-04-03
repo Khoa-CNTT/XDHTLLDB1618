@@ -35,7 +35,8 @@
     "subscription": "Subscriptions",
     "facebook": "Facebook",
     "threads": "Threads",
-    "reddit": "Reddit"
+    "reddit": "Reddit",
+    "details": "Details"
   },
   "connect": {
     "title": "Connect Platforms",

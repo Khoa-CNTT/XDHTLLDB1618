@@ -11,6 +11,11 @@ export default {
   theme: {
     extend: {
       colors: {
+        facebook: 'var(--facebook)',
+        threads: 'var(--threads)',
+        instagram: 'var(--instagram)',
+        reddit: 'var(--reddit)',
+        twitter: 'var(--twitter)',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

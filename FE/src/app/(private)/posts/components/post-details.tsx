@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { FADE_IN_ANIMATION } from '@/constants/effects'
 import { dummyComments } from '@/data/post.dummy'
+import { toCapitalize } from '@/utils/utils'
 import { User } from '@clerk/nextjs/server'
 import { format } from 'date-fns'
 import { ArrowLeft, Calendar, Clock, MessageCircle, Share2, ThumbsUp } from 'lucide-react'
@@ -17,12 +18,13 @@ import { Card, CardContent } from '@/components/ui/card'
 import ElementEffect from '@/components/effects/element-effect'
 
 export interface PostDetailsProps {
-  post: Post & { user: User | null }
+  post: Post
 }
 
 export default function PostDetails({ post }: PostDetailsProps) {
   const pathname = usePathname()
   const platform = pathname.split('/')[2]
+
   return (
     <div className='min-h-screen bg-muted'>
       <div className='container mx-auto py-8'>
@@ -42,13 +44,13 @@ export default function PostDetails({ post }: PostDetailsProps) {
                 <div className='flex items-center justify-between flex-wrap gap-4'>
                   <div className='flex items-center gap-4'>
                     <Avatar className='size-12 border-2 border-primary/10'>
-                      <AvatarImage src={post?.user?.imageUrl ?? ''} />
-                      <AvatarFallback>{post?.user?.fullName?.[0] ?? 'A'}</AvatarFallback>
+                      <AvatarImage src={post?.socialCredential?.metadata.avatar_url ?? ''} />
+                      <AvatarFallback>{post?.socialCredential?.metadata.name ?? 'A'}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h1 className='text-2xl font-bold'>{post?.metadata?.page_name}</h1>
+                      <h1 className='text-2xl font-bold'>{post?.socialCredential?.metadata.name}</h1>
                       <div className='flex items-center gap-2 mt-1'>
-                        <Badge variant='default'>{post?.metadata?.type}</Badge>
+                        <Badge variant='default'>{toCapitalize(post?.metadata.type)}</Badge>
                         <Badge variant='outline' className='capitalize'>
                           {post?.status}
                         </Badge>
@@ -72,12 +74,18 @@ export default function PostDetails({ post }: PostDetailsProps) {
                 <p className='text-lg leading-relaxed mb-8'>{post?.metadata?.content ?? ''}</p>
 
                 <div className='grid grid-cols-2 gap-4 mb-8'>
-                  {post.metadata.assets.map((asset, index) => (
+                  {post?.metadata.assets.map((asset, index) => (
                     <div
                       key={index}
                       className='aspect-[4/3] relative rounded-lg overflow-hidden bg-muted hover:opacity-90 transition-opacity cursor-pointer'
                     >
-                      <Image src={asset.url} alt='' className='object-cover size-full' fill />
+                      <Image
+                        src={asset.url}
+                        alt=''
+                        className='object-cover'
+                        fill
+                        sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+                      />
                     </div>
                   ))}
                 </div>

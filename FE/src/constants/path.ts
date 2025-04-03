@@ -5,7 +5,7 @@ const path = {
   schedules: '/schedules',
   posts: '/posts',
   posts_facebook: '/posts/facebook',
-  posts_instagram: '/posts/instagram',
+  posts_threads: '/posts/threads',
   posts_reddit: '/posts/reddit',
   connect: '/connect',
   settings: '/settings',

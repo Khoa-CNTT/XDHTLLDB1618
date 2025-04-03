@@ -1,6 +1,7 @@
 import path from '@/constants/path'
 import { CalendarCheck, CreditCard, FileText, Settings2 } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaReddit, FaUserPlus } from 'react-icons/fa'
+import { FaThreads } from 'react-icons/fa6'
 
 export const SIDE_BAR = {
   navMain: [
@@ -21,9 +22,9 @@ export const SIDE_BAR = {
           icon: FaFacebook
         },
         {
-          title: 'Instagram',
-          url: path.posts_instagram,
-          icon: FaInstagram
+          title: 'Threads',
+          url: path.posts_threads,
+          icon: FaThreads
         },
         {
           title: 'Reddit',
@@ -51,13 +52,12 @@ export const SIDE_BAR = {
 }
 
 export const PLATFORM_COLORS = {
-  FACEBOOK: '#1877F2',
-  THREADS: '#000000',
-  INSTAGRAM: '#C13584',
-  REDDIT: '#FF4500',
-  TWITTER: '#1DA1F2'
+  FACEBOOK: '--facebook',
+  THREADS: '--threads',
+  INSTAGRAM: '--instagram',
+  REDDIT: '--reddit',
+  TWITTER: '--twitter'
 }
-
 export const PLATFORM_TYPE = {
   FACEBOOK: 'facebook',
   INSTAGRAM: 'instagram',
@@ -65,5 +65,10 @@ export const PLATFORM_TYPE = {
   THREADS: 'threads',
   TWITTER: 'twitter'
 } as const
+export const PLATFORM_ICONS = {
+  FACEBOOK: FaFacebook,
+  INSTAGRAM: FaInstagram,
+  REDDIT: FaReddit
+}
 
 export const DEFAULT_NUMBER_OF_SKELETON = 3

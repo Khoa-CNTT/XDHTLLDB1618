@@ -2,8 +2,11 @@
 
 import { useMemo } from 'react'
 import { usePathname } from 'next/navigation'
+import { validate as uuidValidate } from 'uuid'
 
 function formatBaseTitle(base: string): string {
+  const isUuid = uuidValidate(base)
+  if (isUuid) return 'details'
   return base
     .split('-')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

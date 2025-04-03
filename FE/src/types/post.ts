@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type Post = {
   id: string
   ownerID: string
@@ -5,15 +6,20 @@ export type Post = {
   status: string
   publicationTime: string
   socialCredentialID: string
+  socialCredential: {
+    metadata: {
+      avatar_url: string
+      name: string
+      [key: string]: any
+    }
+  }
   metadata: {
-    page_name: string
     type: string
     content: string
     assets: {
       type: string
       url: string
     }[]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any
   }
 }

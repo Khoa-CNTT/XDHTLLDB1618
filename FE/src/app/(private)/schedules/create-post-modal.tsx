@@ -85,6 +85,7 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
         })) || []
       )
       form.setValue('type', post?.metadata.type || PostType.POST)
+      form.setValue('selectedPages', [post.socialCredentialID])
     }
   }, [post])
 
@@ -489,7 +490,7 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
                               <Button
                                 type='button'
                                 onClick={() => removeImage(index)}
-                                className='absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity size-8 z-20'
+                                className='absolute top-1 right-1 bg-red-500 hover:bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 size-8 z-20'
                               >
                                 <X className='size-4' />
                               </Button>
