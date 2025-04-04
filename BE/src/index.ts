@@ -9,6 +9,8 @@ import fs from 'fs'
 import path from 'path'
 import yaml from 'yaml'
 import appRouter from './routes'
+import { initFolder } from './utils/file'
+import schedulePostsJob from './jobs/schedule-post'
 
 const app = express()
 const port = envConfig.port
@@ -16,6 +18,8 @@ const port = envConfig.port
 // middlewares
 app.use(cors())
 app.use(express.json())
+
+initFolder('uploads/images/temp')
 
 // connect to the database
 async function connectToDatabase() {
@@ -38,13 +42,16 @@ app.get('/', async (req: Request, res: Response) => {
 app.use('/api/v1', appRouter)
 
 // swagger
-const swaggerPath = path.join(__dirname, '../docs/openapi.yaml')
+const swaggerPath = path.join(__dirname, '../docs/docs.yaml')
 const file = fs.readFileSync(swaggerPath, 'utf8')
 const swaggerDocument = yaml.parse(file)
 app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 // error handler
 app.use(defaultErrorHandler as ErrorRequestHandler)
+
+// job
+schedulePostsJob.start()
 
 const server = app.listen(port, async () => {
   await connectToDatabase()
@@ -53,6 +60,7 @@ const server = app.listen(port, async () => {
 
 process.on('SIGINT', () => {
   server.close(async () => {
+    schedulePostsJob.stop()
     await database.$disconnect()
     console.log('Disconnected')
     console.log('Server closed')

@@ -2,10 +2,12 @@ import { Request, Response } from 'express'
 import { HTTP_STATUS_CODE } from '~/constants/httpStatusCode'
 import postServices from '~/services/posts.services'
 import { ParamsDictionary } from 'express-serve-static-core'
-import { CreatePostRequestBody } from '~/models/request/posts.request'
+import { CreatePostRequestBody, GetPostDetailsParams, GetPostQuery } from '~/models/request/posts.request'
 
-export const getPostsController = async (req: Request, res: Response) => {
-  const result = await postServices.getPosts()
+export const getPostsController = async (req: Request<ParamsDictionary, any, any, GetPostQuery>, res: Response) => {
+  const ownerId = req.auth?.userId
+  const platform = req.query.platform
+  const result = await postServices.getPosts(ownerId as string, platform)
 
   res.status(HTTP_STATUS_CODE.OK).json({
     data: result,
@@ -13,11 +15,23 @@ export const getPostsController = async (req: Request, res: Response) => {
   })
 }
 
-export const createPostController = async (
+export const schedulePostController = async (
   req: Request<ParamsDictionary, any, CreatePostRequestBody>,
   res: Response
 ) => {
+  const body = req.body
+  await postServices.schedulePost(body)
   res.status(HTTP_STATUS_CODE.CREATED).json({
     message: 'Create post successfully'
+  })
+}
+
+export const getPostDetailsController = async (req: Request<GetPostDetailsParams>, res: Response) => {
+  const postId = req.params.id
+  const result = await postServices.getPostDetails(postId)
+
+  res.status(HTTP_STATUS_CODE.OK).json({
+    data: result,
+    message: 'Get post details successfully'
   })
 }

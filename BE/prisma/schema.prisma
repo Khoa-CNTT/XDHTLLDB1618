@@ -16,21 +16,24 @@ datasource db {
 
 
 model Post {
-  id                  String            @id @default(uuid())
-  ownerId             String            @unique 
+  id                  String            @id @default(uuid())         
   platform            String
   metadata            Json
   publicationTime     DateTime
-  socialCredentialId  String
-  socialCredential    SocialCredential  @relation(fields: [socialCredentialId], references: [id])
+  socialCredentialID  String
+  socialCredential    SocialCredential  @relation(fields: [socialCredentialID], references: [id])
   status              String
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
+
+  @@map("posts")
 }
 
 model SocialCredential {
   id        String   @id @default(uuid())
-  socialId  String   @unique
+  ownerId             String   
+  socialOwnerId String 
+  socialId  String   
   platform  String
   credentials Json
   metadata  Json
@@ -38,4 +41,6 @@ model SocialCredential {
   updatedAt DateTime @updatedAt
 
   Post Post[]
+
+  @@map("social_credentials")
 }
