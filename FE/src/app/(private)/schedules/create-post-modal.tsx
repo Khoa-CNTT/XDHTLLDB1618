@@ -162,7 +162,7 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
             socialCredentialID: credential.id,
             metadata: {
               //TODO: Refactor
-              type: credential.platform === 'facebook' ? data.type : 'carousel',
+              type: credential.platform === 'facebook' ? data.type : 'post',
               content: data.description,
               assets:
                 uploadImagesResponse.data.data.map((image) => ({
@@ -536,7 +536,11 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
           </form>
         </Form>
       </DialogContent>
-      <ImageSlider showImageSlider={showImageSlider} setShowImageSlider={setShowImageSlider} preview={preview} />
+      <ImageSlider
+        showImageSlider={showImageSlider}
+        setShowImageSlider={setShowImageSlider}
+        preview={{ images: preview.images.map((img) => ({ preview: img.preview })) }}
+      />
     </Dialog>
   )
 }

@@ -1,12 +1,10 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { FADE_IN_ANIMATION } from '@/constants/effects'
 import { dummyComments } from '@/data/post.dummy'
 import { toCapitalize } from '@/utils/utils'
-import { User } from '@clerk/nextjs/server'
 import { format } from 'date-fns'
 import { ArrowLeft, Calendar, Clock, MessageCircle, Share2, ThumbsUp } from 'lucide-react'
 
@@ -16,6 +14,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import ElementEffect from '@/components/effects/element-effect'
+
+import PostDetailsListImage from './post-details-list-image'
 
 export interface PostDetailsProps {
   post: Post
@@ -73,22 +73,7 @@ export default function PostDetails({ post }: PostDetailsProps) {
               <CardContent className='p-6'>
                 <p className='text-lg leading-relaxed mb-8'>{post?.metadata?.content ?? ''}</p>
 
-                <div className='grid grid-cols-2 gap-4 mb-8'>
-                  {post?.metadata.assets.map((asset, index) => (
-                    <div
-                      key={index}
-                      className='aspect-[4/3] relative rounded-lg overflow-hidden bg-muted hover:opacity-90 transition-opacity cursor-pointer'
-                    >
-                      <Image
-                        src={asset.url}
-                        alt=''
-                        className='object-cover'
-                        fill
-                        sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-                      />
-                    </div>
-                  ))}
-                </div>
+                <PostDetailsListImage images={post?.metadata?.assets ?? []} />
 
                 <div className='flex items-center gap-4 pt-6 border-t'>
                   <Button variant='outline' className='flex-1'>

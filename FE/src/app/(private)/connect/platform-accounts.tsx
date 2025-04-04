@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { DEFAULT_NUMBER_OF_SKELETON } from '@/constants'
 import { Platform, PlatformType } from '@/constants/credentials'
 import { useCredentialQuery } from '@/queries/credentials'
@@ -35,15 +36,18 @@ interface PlatformAccountsProps {
 }
 
 export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAccountsProps) {
-  const { data: credentials, isLoading, refetch } = useCredentialQuery(platformId)
+  const searchParams = useSearchParams()
+  const isNotAllowFetching = Boolean(searchParams.get('code'))
+  const { data: credentials, isLoading } = useCredentialQuery(platformId, isNotAllowFetching)
   const t = useTranslations('connect')
+  const btnTextConnect = t('connectAccount')
 
   const getPlatformButton = () => {
     switch (platformId) {
       case Platform.FACEBOOK:
-        return <FacebookSdk refetch={refetch} btnText={t('connectAccount')} />
+        return <FacebookSdk btnText={btnTextConnect} />
       case Platform.THREADS:
-        return <Threads />
+        return <Threads btnText={btnTextConnect} />
       default:
         return null
     }
@@ -58,7 +62,7 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
     <Card>
       <CardContent className='pt-6'>
         <div className='flex justify-end mb-6'>{getPlatformButton()}</div>
-        {isLoading ? (
+        {isLoading || isNotAllowFetching ? (
           <div className='space-y-4'>
             {Array(DEFAULT_NUMBER_OF_SKELETON)
               .fill(0)
@@ -82,7 +86,9 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
                     </Avatar>
                     <div>
                       <h4 className='font-semibold'>{account.metadata.name}</h4>
-                      <p className='text-sm text-muted-foreground'>{account.metadata.fan_count}</p>
+                      <p className='text-sm text-muted-foreground'>
+                        {account.metadata.fan_count ?? account.metadata.username}
+                      </p>
                     </div>
                   </div>
                   <div className='flex items-center gap-2 ml-auto'>

@@ -11,9 +11,9 @@ export interface ImageSliderProps {
   showImageSlider: boolean
   setShowImageSlider: (show: boolean) => void
   preview: {
-    description: string
-    time: string
-    images: ImagePreview[]
+    images: {
+      preview: string
+    }[]
   }
 }
 

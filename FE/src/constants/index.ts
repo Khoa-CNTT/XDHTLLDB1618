@@ -68,7 +68,8 @@ export const PLATFORM_TYPE = {
 export const PLATFORM_ICONS = {
   FACEBOOK: FaFacebook,
   INSTAGRAM: FaInstagram,
-  REDDIT: FaReddit
+  REDDIT: FaReddit,
+  THREADS: FaThreads
 }
 
 export const DEFAULT_NUMBER_OF_SKELETON = 3

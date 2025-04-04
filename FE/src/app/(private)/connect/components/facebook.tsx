@@ -2,16 +2,11 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from 'react'
-import credentialApi from '@/apis/credentials.api'
 import configs from '@/configs'
-import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query'
+import { Platform } from '@/constants/credentials'
+import { useCreateCredentialMutation } from '@/queries/credentials'
 
 import { Button } from '@/components/ui/button'
-
-interface Props {
-  btnText: string
-  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult>
-}
 
 const loadFacebookSDK = () => {
   return new Promise((resolve, reject) => {
@@ -40,7 +35,8 @@ const loadFacebookSDK = () => {
   })
 }
 
-export default function FacebookSdk({ refetch, btnText }: Props) {
+export default function FacebookSdk({ btnText }: { btnText: string }) {
+  const createCredentialMutation = useCreateCredentialMutation(Platform.FACEBOOK)
   useEffect(() => {
     const initializeFacebookSDK = async () => {
       try {
@@ -90,8 +86,7 @@ export default function FacebookSdk({ refetch, btnText }: Props) {
                       fan_count: item.fan_count
                     }
                   }))
-                  await credentialApi.connectSocialAccount(body)
-                  refetch()
+                  await createCredentialMutation.mutateAsync(body)
                 }
                 console.log('Good to see you, ' + response.name + '.')
               })

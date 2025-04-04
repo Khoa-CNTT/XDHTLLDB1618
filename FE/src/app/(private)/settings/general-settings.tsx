@@ -1,4 +1,5 @@
 import { FADE_IN_ANIMATION } from '@/constants/effects'
+import { currentUser } from '@clerk/nextjs/server'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -7,7 +8,8 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import ElementEffect from '@/components/effects/element-effect'
 
-export function GeneralSettings() {
+export async function GeneralSettings() {
+  const user = await currentUser()
   return (
     <div className='grid gap-6'>
       <ElementEffect animationProps={FADE_IN_ANIMATION}>
@@ -19,11 +21,16 @@ export function GeneralSettings() {
           <CardContent className='space-y-4'>
             <div className='grid gap-2'>
               <Label htmlFor='name'>Name</Label>
-              <Input id='name' placeholder='Enter your name' defaultValue='Tuyen Pham' />
+              <Input id='name' placeholder='Enter your name' defaultValue={user?.fullName ?? 'tuyen pham'} />
             </div>
             <div className='grid gap-2'>
               <Label htmlFor='email'>Email</Label>
-              <Input id='email' type='email' placeholder='Enter your email' defaultValue='tuyenpham104.dev@gmail.com' />
+              <Input
+                id='email'
+                type='email'
+                placeholder='Enter your email'
+                defaultValue={user?.emailAddresses[0].emailAddress ?? 'tuyenpham104.dev@gmail.com'}
+              />
             </div>
             <Button>Save Changes</Button>
           </CardContent>
