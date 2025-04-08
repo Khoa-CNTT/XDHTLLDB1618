@@ -2,6 +2,7 @@ import path from '@/constants/path'
 import { CalendarCheck, CreditCard, FileText, Settings2 } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaReddit, FaUserPlus } from 'react-icons/fa'
 import { FaThreads } from 'react-icons/fa6'
+import { RiTwitterXLine } from 'react-icons/ri'
 
 export const SIDE_BAR = {
   navMain: [
@@ -30,6 +31,11 @@ export const SIDE_BAR = {
           title: 'Reddit',
           url: path.posts_reddit,
           icon: FaReddit
+        },
+        {
+          title: 'X',
+          url: path.posts_x,
+          icon: RiTwitterXLine
         }
       ]
     },
@@ -56,14 +62,14 @@ export const PLATFORM_COLORS = {
   THREADS: '--threads',
   INSTAGRAM: '--instagram',
   REDDIT: '--reddit',
-  TWITTER: '--twitter'
+  X: '--x'
 }
 export const PLATFORM_TYPE = {
   FACEBOOK: 'facebook',
   INSTAGRAM: 'instagram',
   REDDIT: 'reddit',
   THREADS: 'threads',
-  TWITTER: 'twitter'
+  X: 'x'
 } as const
 export const PLATFORM_ICONS = {
   FACEBOOK: FaFacebook,

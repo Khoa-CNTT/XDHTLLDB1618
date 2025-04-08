@@ -9,7 +9,10 @@ const configs = {
   redditSecret: (process.env.NEXT_PUBLIC_REDDIT_SECRET as string) || '',
   returnUrl: (process.env.NEXT_PUBLIC_RETURN_URL as string) || '',
   threadAppId: (process.env.NEXT_PUBLIC_THREADS_APP_ID as string) || '',
-  geminiApiKey: (process.env.NEXT_PUBLIC_GEMINI_API_KEY as string) || ''
+  geminiApiKey: (process.env.NEXT_PUBLIC_GEMINI_API_KEY as string) || '',
+  xClientId: (process.env.NEXT_PUBLIC_X_CLIENT_ID as string) || '',
+  xClientSecret: (process.env.NEXT_PUBLIC_X_CLIENT_SECRET as string) || '',
+  xCodeVerifierString: (process.env.NEXT_PUBLIC_X_CODE_VERIFIER_STRING as string) || ''
 }
 
 export default configs

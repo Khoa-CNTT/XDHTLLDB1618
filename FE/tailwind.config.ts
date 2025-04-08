@@ -15,7 +15,7 @@ export default {
         threads: 'var(--threads)',
         instagram: 'var(--instagram)',
         reddit: 'var(--reddit)',
-        twitter: 'var(--twitter)',
+        x: 'var(--x)',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

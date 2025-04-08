@@ -13,8 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import PlatformSkeleton from '@/components/skeleton/platform-skeleton'
 
-import FacebookSdk from './components/facebook'
-import Threads from './components/threads'
+import { Facebook, Threads, X } from './components'
 
 // import { useCredentialQuery } from '@/queries/credentials'
 
@@ -37,7 +36,9 @@ interface PlatformAccountsProps {
 
 export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAccountsProps) {
   const searchParams = useSearchParams()
-  const isNotAllowFetching = Boolean(searchParams.get('code'))
+  const isNotAllowFetching = Boolean(
+    searchParams.get('code') || searchParams.get('oauth_token') || searchParams.get('oauth_verifier')
+  )
   const { data: credentials, isLoading } = useCredentialQuery(platformId, isNotAllowFetching)
   const t = useTranslations('connect')
   const btnTextConnect = t('connectAccount')
@@ -45,9 +46,11 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
   const getPlatformButton = () => {
     switch (platformId) {
       case Platform.FACEBOOK:
-        return <FacebookSdk btnText={btnTextConnect} />
+        return <Facebook btnText={btnTextConnect} />
       case Platform.THREADS:
         return <Threads btnText={btnTextConnect} />
+      case Platform.X:
+        return <X btnText={btnTextConnect} />
       default:
         return null
     }

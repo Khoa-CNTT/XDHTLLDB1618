@@ -11,3 +11,14 @@ export const removeTokensFromLocalStorage = () => {
     localStorage.removeItem(TokenType.ACCESS_TOKEN)
   }
 }
+
+export const setXCodeVerifierToLocalStorage = (value: string) =>
+  isClient && localStorage.setItem('X_CODE_VERIFIER', value)
+
+export const getXCodeVerifierFromLocalStorage = () => (isClient ? localStorage.getItem('X_CODE_VERIFIER') : null)
+
+export const removeXCodeVerifierFromLocalStorage = () => {
+  if (isClient) {
+    localStorage.removeItem('X_CODE_VERIFIER')
+  }
+}

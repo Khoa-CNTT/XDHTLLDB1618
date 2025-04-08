@@ -28,8 +28,12 @@ const postApi = {
       }
     })
   },
-  getPostByIdServer(id: string) {
-    return http.get<SuccessResponse<Post>>(`${POST_URI}/${id}`)
+  getPostByIdServer(id: string, accessToken: string) {
+    return http.get<SuccessResponse<Post>>(`${POST_URI}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
   }
 }
 

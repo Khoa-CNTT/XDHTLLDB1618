@@ -49,7 +49,7 @@ export default function AppInput<T extends FieldValues>({ field }: Props<T>) {
   const divRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className='relative rounded-md' ref={divRef}>
+    <div className='relative rounded-b-md' ref={divRef}>
       <Textarea
         ref={textareaRef}
         value={text}

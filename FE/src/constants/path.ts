@@ -7,6 +7,7 @@ const path = {
   posts_facebook: '/posts/facebook',
   posts_threads: '/posts/threads',
   posts_reddit: '/posts/reddit',
+  posts_x: '/posts/x',
   connect: '/connect',
   settings: '/settings',
   subscription: '/subscription',
