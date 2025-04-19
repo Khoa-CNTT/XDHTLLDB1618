@@ -29,6 +29,7 @@
   "sidebar": {
     "platform": "Platform",
     "schedules": "Schedules",
+    "dashboard": "Dashboard",
     "posts": "Posts",
     "settings": "Settings",
     "connect": "Connect",
@@ -37,7 +38,9 @@
     "threads": "Threads",
     "reddit": "Reddit",
     "x": "X",
-    "details": "Details"
+    "details": "Details",
+    "instagram": "Instagram",
+    "bot": "Bot"
   },
   "connect": {
     "title": "Connect Platforms",

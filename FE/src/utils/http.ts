@@ -57,7 +57,7 @@ export class UnprocessableEntityError extends HttpError {
 const isClient = typeof window !== 'undefined'
 const http = axios.create({
   baseURL: configs.baseUrl,
-  timeout: 10000,
+  timeout: 20000,
   headers: {
     'Content-Type': 'application/json'
   }

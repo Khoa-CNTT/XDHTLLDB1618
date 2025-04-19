@@ -13,6 +13,7 @@ export type Post = {
       [key: string]: any
     }
   }
+  publishedPost: any
   metadata: {
     type: string
     content: string

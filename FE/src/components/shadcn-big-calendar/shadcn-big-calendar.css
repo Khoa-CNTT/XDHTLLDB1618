@@ -619,7 +619,6 @@ button.rbc-input::-moz-focus-inner {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
   box-shadow: none !important;
-  color: hsl(var(--foreground)) !important;
 }
 .rbc-toolbar button.rbc-active {
   color: hsl(var(--accent-foreground)) !important;

@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import PlatformSkeleton from '@/components/skeleton/platform-skeleton'
 
 import { Facebook, Threads, X } from './components'
+import Instagram from './components/instagram'
 
 // import { useCredentialQuery } from '@/queries/credentials'
 
@@ -51,6 +52,8 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
         return <Threads btnText={btnTextConnect} />
       case Platform.X:
         return <X btnText={btnTextConnect} />
+      case Platform.INSTAGRAM:
+        return <Instagram btnText={btnTextConnect} />
       default:
         return null
     }

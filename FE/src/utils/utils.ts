@@ -1,3 +1,7 @@
+import { FaFacebook, FaInstagram } from 'react-icons/fa'
+import { FaThreads } from 'react-icons/fa6'
+import { RiTwitterXLine } from 'react-icons/ri'
+
 export const toCapitalize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
@@ -38,5 +42,18 @@ export const generatePkcePair = async (): Promise<{ codeVerifier: string; codeCh
   return {
     codeVerifier,
     codeChallenge
+  }
+}
+
+export const getIconPlatform = (platform: string) => {
+  switch (platform) {
+    case 'facebook':
+      return FaFacebook
+    case 'instagram':
+      return FaInstagram
+    case 'threads':
+      return FaThreads
+    case 'x':
+      return RiTwitterXLine
   }
 }

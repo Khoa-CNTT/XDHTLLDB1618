@@ -12,7 +12,11 @@ const configs = {
   geminiApiKey: (process.env.NEXT_PUBLIC_GEMINI_API_KEY as string) || '',
   xClientId: (process.env.NEXT_PUBLIC_X_CLIENT_ID as string) || '',
   xClientSecret: (process.env.NEXT_PUBLIC_X_CLIENT_SECRET as string) || '',
-  xCodeVerifierString: (process.env.NEXT_PUBLIC_X_CODE_VERIFIER_STRING as string) || ''
+  xCodeVerifierString: (process.env.NEXT_PUBLIC_X_CODE_VERIFIER_STRING as string) || '',
+  instagramAppId: (process.env.NEXT_PUBLIC_INSTAGRAM_APP_ID as string) || '',
+  instagramAppSecret: (process.env.NEXT_PUBLIC_INSTAGRAM_APP_SECRET as string) || '',
+  instagramRedirectUri: (process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI as string) || '',
+  telegramBotName: (process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME as string) || ''
 }
 
 export default configs

@@ -8,10 +8,12 @@ import { useAppContext } from '@/contexts/app-context'
 import { useUploadImagesMutation } from '@/queries/media'
 import { useCreatePostMutation } from '@/queries/post'
 import { postSchema, PostSchema } from '@/schema-validations/post'
+import { getIconPlatform } from '@/utils/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Calendar, Heart, Loader2, MessageCircle, Share2, Upload, X } from 'lucide-react'
 import moment from 'moment'
 import { useForm } from 'react-hook-form'
+import { IconType } from 'react-icons'
 import { FaFacebook } from 'react-icons/fa'
 import ShowMoreText from 'react-show-more-text'
 
@@ -247,33 +249,39 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
                       key={credential.id}
                       control={form.control}
                       name='selectedPages'
-                      render={({ field }) => (
-                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(credential.id)}
-                              onCheckedChange={(checked) => {
-                                const currentValue = field.value || []
-                                const newValue = checked
-                                  ? [...currentValue, credential.id]
-                                  : currentValue.filter((id) => id !== credential.id)
-                                field.onChange(newValue)
-                                // Update scheduleAll if all pages are selected
-                                form.setValue('scheduleAll', newValue.length === credentials.length)
-                              }}
-                            />
-                          </FormControl>
-                          <div className='flex items-center gap-2'>
-                            <Avatar className='size-8'>
-                              <AvatarImage src={credential.metadata.avatar_url} />
-                              <AvatarFallback>
-                                <FaFacebook className='size-4' />
-                              </AvatarFallback>
-                            </Avatar>
-                            <FormLabel className='font-normal cursor-pointer'>{credential.metadata.name}</FormLabel>
-                          </div>
-                        </FormItem>
-                      )}
+                      render={({ field }) => {
+                        const PlatformIcon = getIconPlatform(credential.platform) as IconType
+                        return (
+                          <FormItem className='flex items-center space-x-3 space-y-0'>
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(credential.id)}
+                                onCheckedChange={(checked) => {
+                                  const currentValue = field.value || []
+                                  const newValue = checked
+                                    ? [...currentValue, credential.id]
+                                    : currentValue.filter((id) => id !== credential.id)
+                                  field.onChange(newValue)
+                                  // Update scheduleAll if all pages are selected
+                                  form.setValue('scheduleAll', newValue.length === credentials.length)
+                                }}
+                              />
+                            </FormControl>
+                            <div className='flex items-center gap-2'>
+                              <Avatar className='size-8'>
+                                <AvatarImage src={credential.metadata.avatar_url} />
+                                <AvatarFallback>
+                                  <PlatformIcon className='size-8' />
+                                </AvatarFallback>
+                              </Avatar>
+                              <FormLabel className='font-normal cursor-pointer flex items-center gap-2'>
+                                <p className='line-clamp-1'>{credential.metadata.name}</p>
+                                <PlatformIcon className='size-5 flex shrink-0' />
+                              </FormLabel>
+                            </div>
+                          </FormItem>
+                        )
+                      }}
                     />
                   ))}
                 </div>
@@ -413,17 +421,21 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
                   />
                 </div>
 
-                <div className='flex justify-end gap-4'>
-                  <Button variant='outline' onClick={() => setOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button disabled={createPostMutation.isPending || uploadImagesMutation.isPending} type='submit'>
-                    {createPostMutation.isPending || uploadImagesMutation.isPending ? 'Scheduling...' : 'Schedule Post'}
-                    {(createPostMutation.isPending || uploadImagesMutation.isPending) && (
-                      <Loader2 className='size-4 animate-spin' />
-                    )}
-                  </Button>
-                </div>
+                {((post && post.status === 'scheduled') || !post) && (
+                  <div className='flex justify-end gap-4'>
+                    <Button variant='outline' onClick={() => setOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button disabled={createPostMutation.isPending || uploadImagesMutation.isPending} type='submit'>
+                      {createPostMutation.isPending || uploadImagesMutation.isPending
+                        ? 'Scheduling...'
+                        : 'Schedule Post'}
+                      {(createPostMutation.isPending || uploadImagesMutation.isPending) && (
+                        <Loader2 className='size-4 animate-spin' />
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 

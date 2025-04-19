@@ -15,13 +15,13 @@ export default function Home() {
 
   useEffect(() => {
     if (isSyncAuthenticated && accessToken) {
-      return router.push(path.schedules)
+      return router.push(path.dashboard)
     }
     if (!isSyncAuthenticated && accessToken) {
       const getTokenAsync = async () => {
         await login(accessToken)
         setIsSyncAuthenticated(true)
-        return router.push(path.schedules)
+        return router.push(path.dashboard)
       }
       getTokenAsync()
     }

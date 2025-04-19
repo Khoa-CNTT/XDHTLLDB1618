@@ -17,7 +17,10 @@ const authApis = {
       {
         baseURL: ''
       }
-    )
+    ),
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  connectTelegram: (body: any) => http.post<{ message: string }>('/auth/telegram', body)
 }
 
 export default authApis

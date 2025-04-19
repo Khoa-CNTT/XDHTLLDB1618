@@ -11,7 +11,7 @@ export default function EventCard({ event }: Props) {
   const Icon = PLATFORM_ICONS[event.platform.toUpperCase() as keyof typeof PLATFORM_ICONS] || PLATFORM_ICONS.FACEBOOK
   return (
     <div className='flex justify-between items-center size-full'>
-      <div className='px-1'>
+      <div className='px-1 text-white'>
         <span className='block mb-1 !line-clamp-1'>{event.socialCredential.metadata.name}</span>
         <Icon className='size-4' />
       </div>

@@ -30,6 +30,7 @@
   "sidebar": {
     "platform": "Nền tảng",
     "schedules": "Lên lịch",
+    "dashboard": "Bảng điều khiển",
     "posts": "Bài viết",
     "settings": "Cài đặt",
     "connect": "Kết nối tài khoản",
@@ -38,7 +39,9 @@
     "threads": "Threads",
     "reddit": "Reddit",
     "x": "X",
-    "details": "Chi tiết"
+    "details": "Chi tiết",
+    "instagram": "Instagram",
+    "bot": "Bot"
   },
   "connect": {
     "title": "Kết nối các nền tảng",

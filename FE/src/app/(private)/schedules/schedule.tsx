@@ -80,7 +80,7 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
       <ShadcnBigCalendar
         dayPropGetter={(date: Date) => {
           if (moment(date).isBefore(moment(), 'minute')) {
-            return { className: 'bg-muted/50 cursor-not-allowed' }
+            return { className: 'bg-muted/30 cursor-not-allowed' }
           }
           return {}
         }}

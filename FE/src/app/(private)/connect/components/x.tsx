@@ -37,7 +37,7 @@ export default function X({ btnText }: { btnText: string }) {
       response_type: 'code',
       client_id: configs.xClientId,
       redirect_uri: `https://localhost:3001/connect?platform=x`,
-      scope: 'tweet.read tweet.write users.read follows.read offline.access media.write',
+      scope: 'tweet.read tweet.write users.read follows.read offline.access media.write like.read like.write',
       state: 'state',
       code_challenge: codeChallenge,
       code_challenge_method: 'S256'

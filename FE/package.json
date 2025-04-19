@@ -12,7 +12,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "openapi-ts": "openapi-ts"
+    "openapi-ts": "openapi-ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.9.6",
@@ -64,8 +65,10 @@
     "react-hook-form": "^7.54.2",
     "react-icons": "^5.4.0",
     "react-show-more-text": "^1.7.1",
+    "recharts": "^2.15.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "telegram-login-button": "^0.1.0",
     "uuid": "^11.1.0",
     "zod": "^3.24.1",
     "zustand": "^5.0.2"

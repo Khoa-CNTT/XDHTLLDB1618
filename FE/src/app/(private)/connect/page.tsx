@@ -10,7 +10,7 @@ import { PlatformAccounts } from './platform-accounts'
 
 export default function ConnectPage() {
   const searchParams = useSearchParams()
-  const platform = searchParams.get('platform')
+  const platform = searchParams.get('platform') || searchParams.get('state')
   const t = useTranslations('connect')
 
   return (
@@ -23,11 +23,12 @@ export default function ConnectPage() {
           </div>
 
           <Tabs defaultValue={platform || 'facebook'} className='w-full'>
-            <TabsList className='grid w-full grid-cols-4 mb-8'>
+            <TabsList className='grid w-full grid-cols-5 mb-8'>
               <TabsTrigger value={Platform.FACEBOOK}>Facebook</TabsTrigger>
               <TabsTrigger value={Platform.THREADS}>Threads</TabsTrigger>
               <TabsTrigger value={Platform.REDDIT}>Reddit</TabsTrigger>
               <TabsTrigger value={Platform.X}>X</TabsTrigger>
+              <TabsTrigger value={Platform.INSTAGRAM}>Instagram</TabsTrigger>
             </TabsList>
             <TabsContent value={Platform.FACEBOOK}>
               <PlatformAccounts platformId={Platform.FACEBOOK} />
@@ -40,6 +41,9 @@ export default function ConnectPage() {
             </TabsContent>
             <TabsContent value={Platform.X}>
               <PlatformAccounts platformId={Platform.X} />
+            </TabsContent>
+            <TabsContent value={Platform.INSTAGRAM}>
+              <PlatformAccounts platformId={Platform.INSTAGRAM} />
             </TabsContent>
           </Tabs>
         </div>
