@@ -1,16 +1,14 @@
 import { CreatePostRequestBody } from '~/models/request/posts.request'
 import database from './database.services'
-import { assert } from 'console'
-import { uploadImageFb } from '~/helpers/facebook'
+
+import { getFbLikes, uploadImageFb } from '~/helpers/facebook'
 import { ErrorWithStatus } from '~/models/errors'
 import { HTTP_STATUS_CODE } from '~/constants/httpStatusCode'
 import { Platform } from '~/constants/enum'
-import {
-  createCarouselThreadsMediaContainer,
-  createSingleItemsContainer,
-  createSingleThreadsMediaContainer
-} from '~/helpers/threads'
+import { createCarouselThreadsMediaContainer, createSingleThreadsMediaContainer } from '~/helpers/threads'
 import { uploadImageXFromUrl } from '~/helpers/x'
+import { omit } from 'lodash'
+import { createCarouselInstagramMediaContainer, createSingleInstagramMediaContainer } from '~/helpers/instagram'
 
 class PostServices {
   async getPosts(ownerId: string, platform: string) {
@@ -26,7 +24,8 @@ class PostServices {
           select: {
             metadata: true
           }
-        }
+        },
+        publishedPost: true
       }
     })
 
@@ -87,35 +86,25 @@ class PostServices {
         // threads
         if (socialPost.platform === Platform.Threads) {
           // type: carousel
+          let createMediaContainerFunction = null
+          let createMediaBody: any = {
+            media_type: socialPost.metadata.assets[0].type.toUpperCase() as 'IMAGE' | 'VIDEO',
+            text: socialPost.metadata.content
+          }
           if (socialPost.metadata.assets.length > 1) {
-            const creation_id = await createCarouselThreadsMediaContainer(credential.access_token, credential.user_id, {
-              media_type: socialPost.metadata.assets[0].type.toUpperCase() as 'IMAGE' | 'VIDEO',
-              image_url: socialPost.metadata.assets.map((asset) => asset.url),
-              text: socialPost.metadata.content
-            })
-            return {
-              status: 'scheduled',
-              publicationTime: body.publicationTime,
-              platform: socialPost.platform,
-              socialCredentialID: socialPost.socialCredentialID,
-              metadata: {
-                type: socialPost.metadata.type,
-                content: socialPost.metadata.content,
-                assets: socialPost.metadata.assets.map((asset) => ({
-                  type: asset.type,
-                  url: asset.url
-                })),
-                creation_id
-              }
-            }
+            createMediaContainerFunction = createCarouselThreadsMediaContainer
+            createMediaBody.image_url = socialPost.metadata.assets.map((asset) => asset.url)
+          } else {
+            createMediaContainerFunction = createSingleThreadsMediaContainer
+            createMediaBody.image_url = socialPost.metadata.assets[0].url
           }
 
           // type: single
-          const creation_id = await createSingleThreadsMediaContainer(credential.access_token, credential.user_id, {
-            media_type: socialPost.metadata.assets[0].type.toUpperCase() as 'IMAGE' | 'VIDEO',
-            image_url: socialPost.metadata.assets[0].url,
-            text: socialPost.metadata.content
-          })
+          const creation_id = await createMediaContainerFunction(
+            credential.access_token,
+            credential.user_id,
+            createMediaBody
+          )
 
           return {
             status: 'scheduled',
@@ -135,16 +124,50 @@ class PostServices {
         }
 
         // x
-        // if (socialPost.platform === Platform.X) {
-        const imageXIds = await Promise.all(
-          socialPost.metadata.assets.map((asset) =>
-            uploadImageXFromUrl(
-              asset.url,
-              credential.access_token,
-              socialPost.socialCredentialID,
-              credential.refresh_token
+        if (socialPost.platform === Platform.X) {
+          const imageXIds = await Promise.all(
+            socialPost.metadata.assets.map((asset) =>
+              uploadImageXFromUrl(
+                asset.url,
+                credential.access_token,
+                socialPost.socialCredentialID,
+                credential.refresh_token
+              )
             )
           )
+
+          return {
+            status: 'scheduled',
+            publicationTime: body.publicationTime,
+            platform: socialPost.platform,
+            socialCredentialID: socialPost.socialCredentialID,
+            metadata: {
+              type: socialPost.metadata.type,
+              content: socialPost.metadata.content,
+              assets: socialPost.metadata.assets.map((asset) => ({
+                type: asset.type,
+                url: asset.url
+              })),
+              media_ids: imageXIds
+            }
+          }
+        }
+        // if (socialPost.platform === Platform.Instagram) {
+        let createMediaContainerFunction = null
+        let createMediaBody: any = {
+          caption: socialPost.metadata.content
+        }
+        if (socialPost.metadata.assets.length > 1) {
+          createMediaContainerFunction = createCarouselInstagramMediaContainer
+          createMediaBody.image_urls = socialPost.metadata.assets.map((asset) => asset.url)
+        } else {
+          createMediaContainerFunction = createSingleInstagramMediaContainer
+          createMediaBody.image_url = socialPost.metadata.assets[0].url
+        }
+        const creation_id = await createMediaContainerFunction(
+          credential.access_token,
+          credential.user_id,
+          createMediaBody
         )
 
         return {
@@ -159,7 +182,7 @@ class PostServices {
               type: asset.type,
               url: asset.url
             })),
-            media_ids: imageXIds
+            creation_id
           }
         }
         // }
@@ -179,13 +202,28 @@ class PostServices {
       include: {
         socialCredential: {
           select: {
-            metadata: true
+            metadata: true,
+            credentials: true
           }
-        }
+        },
+        publishedPost: true
       }
     })
 
-    return post
+    if (post?.publishedPost) {
+      let metadata: any = {}
+
+      if (post?.platform === Platform.Facebook) {
+        metadata.likes = await getFbLikes(
+          post.publishedPost.postId,
+          (post.socialCredential.credentials as any).access_token
+        )
+      }
+
+      post.publishedPost.metadata = metadata
+    }
+
+    return omit(post, ['socialCredential.credentials'])
   }
 }
 
