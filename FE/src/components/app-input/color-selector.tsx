@@ -1,21 +1,24 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Check } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
-const ColorSelector = () => {
-  const [selectedColor, setSelectedColor] = useState('')
+interface ColorSelectorProps {
+  value: string
+  onChange: (value: string) => void
+}
 
+const ColorSelector = ({ value, onChange }: ColorSelectorProps) => {
   const colors = [
-    { name: 'Red', value: '#EF4444', className: 'bg-red-500 hover:bg-red-600' },
-    { name: 'Blue', value: '#3B82F6', className: 'bg-blue-500 hover:bg-blue-600' },
-    { name: 'Green', value: '#22C55E', className: 'bg-green-500 hover:bg-green-600' },
-    { name: 'Yellow', value: '#EAB308', className: 'bg-yellow-500 hover:bg-yellow-600' },
-    { name: 'Purple', value: '#A855F7', className: 'bg-purple-500 hover:bg-purple-600' },
-    { name: 'Pink', value: '#EC4899', className: 'bg-pink-500 hover:bg-pink-600' },
-    { name: 'Orange', value: '#F97316', className: 'bg-orange-500 hover:bg-orange-600' },
-    { name: 'Gray', value: '#6B7280', className: 'bg-gray-500 hover:bg-gray-600' }
+    { name: 'Red', value: 'bg-red-500', className: 'bg-red-500 hover:bg-red-600' },
+    { name: 'Blue', value: 'bg-blue-500', className: 'bg-blue-500 hover:bg-blue-600' },
+    { name: 'Green', value: 'bg-green-500', className: 'bg-green-500 hover:bg-green-600' },
+    { name: 'Yellow', value: 'bg-yellow-500', className: 'bg-yellow-500 hover:bg-yellow-600' },
+    { name: 'Purple', value: 'bg-purple-500', className: 'bg-purple-500 hover:bg-purple-600' },
+    { name: 'Pink', value: 'bg-pink-500', className: 'bg-pink-500 hover:bg-pink-600' },
+    { name: 'Orange', value: 'bg-orange-500', className: 'bg-orange-500 hover:bg-orange-600' },
+    { name: 'Gray', value: 'bg-gray-500', className: 'bg-gray-500 hover:bg-gray-600' }
   ]
 
   return (
@@ -25,16 +28,17 @@ const ColorSelector = () => {
           key={color.value}
           variant='outline'
           size='icon'
+          type='button'
           className={cn(
             'h-10 w-10 rounded-full relative',
             color.className,
-            selectedColor === color.value && 'ring-2 ring-offset-2 ring-offset-white'
+            value === color.value && 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-950'
           )}
-          onClick={() => setSelectedColor(color.value)}
+          onClick={() => onChange(color.value)}
           title={color.name}
         >
           <span className='sr-only'>{color.name}</span>
-          {selectedColor === color.value && <Check className='size-4 text-white absolute' />}
+          {value === color.value && <Check className='size-4 text-white absolute' />}
         </Button>
       ))}
     </div>

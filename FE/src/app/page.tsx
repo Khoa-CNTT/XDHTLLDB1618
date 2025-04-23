@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import path from '@/constants/path'
 import { useAuthContext } from '@/contexts/app-context'
 import { useAuthLogin } from '@/queries/auth'
+import { setAccessTokenToLocalStorage } from '@/utils/local-storage'
 
 import LoadingIndicator from '@/components/loading-indicator'
 
@@ -19,9 +20,12 @@ export default function Home() {
     }
     if (!isSyncAuthenticated && accessToken) {
       const getTokenAsync = async () => {
-        await login(accessToken)
-        setIsSyncAuthenticated(true)
-        return router.push(path.dashboard)
+        const data = await login(accessToken)
+        if (data && data.token) {
+          setAccessTokenToLocalStorage(data.token)
+          setIsSyncAuthenticated(true)
+          return router.push(path.dashboard)
+        }
       }
       getTokenAsync()
     }

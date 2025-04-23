@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import path from '@/constants/path'
 import { useAppContext, useAuthContext } from '@/contexts/app-context'
 import { useAuthLogout } from '@/queries/auth'
+import { removeTokensFromLocalStorage } from '@/utils/local-storage'
 import { useClerk } from '@clerk/nextjs'
 import { Loader2 } from 'lucide-react'
 
@@ -23,6 +24,7 @@ export default function LogoutPage() {
 
   useEffect(() => {
     logoutMutation.mutateAsync().then(() => {
+      removeTokensFromLocalStorage()
       signOut(() => {
         resetContext()
         router.push(path.login)

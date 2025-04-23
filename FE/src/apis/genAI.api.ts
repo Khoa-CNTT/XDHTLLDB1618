@@ -2,8 +2,9 @@ import http from '@/utils/http'
 
 const genAIApis = {
   genAI: (data: { data: string }) => {
-    return http.post<string>('/api/ai', data, {
-      baseURL: ''
+    return fetch('/api/ai', {
+      method: 'POST',
+      body: JSON.stringify(data)
     })
   }
 }

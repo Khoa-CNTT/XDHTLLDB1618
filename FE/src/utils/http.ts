@@ -86,15 +86,6 @@ http.interceptors.request.use(
 // Add a response interceptor
 http.interceptors.response.use(
   function (response) {
-    if (isClient) {
-      const url = response.config.url ?? ''
-      if (['/api/auth/login'].includes(url)) {
-        const token = (response.data as { token: string }).token
-        setAccessTokenToLocalStorage(token)
-      } else if (['/api/auth/logout'].includes(url)) {
-        removeTokensFromLocalStorage()
-      }
-    }
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
     return response

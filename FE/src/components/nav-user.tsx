@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import path from '@/constants/path'
 import { useAppContext, useAuthContext } from '@/contexts/app-context'
 import { useAuthLogout } from '@/queries/auth'
+import { removeTokensFromLocalStorage } from '@/utils/local-storage'
 import { useClerk, useUser } from '@clerk/nextjs'
 import { AvatarFallback } from '@radix-ui/react-avatar'
 import { BadgeCheck, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react'
@@ -49,6 +50,7 @@ export function NavUser() {
         description: 'Please wait while we log you out.'
       })
       await logoutMutation.mutateAsync()
+      removeTokensFromLocalStorage()
       signOut(() => {
         dismiss(toastId.id)
         resetContext()

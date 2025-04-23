@@ -49,16 +49,16 @@ export default function AppInput<T extends FieldValues>({ field }: Props<T>) {
   const divRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className='relative rounded-b-md' ref={divRef}>
+    <div className='relative rounded-b-md border' ref={divRef}>
       <Textarea
         ref={textareaRef}
         value={text}
         minLength={7}
         onFocus={() => {
-          divRef.current?.classList.add('border-ring', 'border')
+          divRef.current?.classList.add('border-ring')
         }}
         onBlur={() => {
-          divRef.current?.classList.remove('border-ring', 'border')
+          divRef.current?.classList.remove('border-ring')
         }}
         className='h-40 border-b-0 rounded-b-none resize-none focus-visible:ring-0 focus-visible:ring-offset-0'
         style={{
@@ -68,7 +68,7 @@ export default function AppInput<T extends FieldValues>({ field }: Props<T>) {
       />
 
       <div className='p-4 flex gap-4 border border-y-input rounded-b-md'>
-        <AIDialog onContentChange={onContentChange} />
+        <AIDialog onContentChange={onContentChange} text={text} />
         <EmojiDialog insertEmoji={insertEmoji} />
         <HashTags onAddHashtags={onAddHashTags} />
       </div>

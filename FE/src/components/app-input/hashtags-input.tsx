@@ -4,9 +4,12 @@ import { X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 
-// Just copy from claude ai :D fix it if exist any bug
-const HashtagInput = () => {
-  const [tags, setTags] = useState<string[]>([])
+interface HashtagInputProps {
+  value: string[]
+  onChange: (value: string[]) => void
+}
+
+const HashtagInput = ({ value, onChange }: HashtagInputProps) => {
   const [inputValue, setInputValue] = useState('')
 
   // Function to clean and validate tag text
@@ -22,7 +25,7 @@ const HashtagInput = () => {
   }
 
   const isValidTag = (tag: string) => {
-    return tag.length > 0 && !tags.includes(tag)
+    return tag.length > 0 && !value.includes(tag)
   }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -37,17 +40,17 @@ const HashtagInput = () => {
       const tag = cleanTagText(inputValue)
 
       if (isValidTag(tag)) {
-        setTags([...tags, tag])
+        onChange([...value, tag])
         setInputValue('')
       }
     }
 
     // Remove last tag on backspace if input is empty
-    if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
+    if (e.key === 'Backspace' && !inputValue && value.length > 0) {
       e.preventDefault()
-      const newTags = [...tags]
+      const newTags = [...value]
       newTags.pop()
-      setTags(newTags)
+      onChange(newTags)
     }
   }
 
@@ -57,7 +60,7 @@ const HashtagInput = () => {
   }
 
   const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove))
+    onChange(value.filter((tag) => tag !== tagToRemove))
   }
 
   // Handle paste event
@@ -70,14 +73,14 @@ const HashtagInput = () => {
       .filter(isValidTag)
 
     if (pastedTags.length > 0) {
-      setTags([...tags, ...pastedTags])
+      onChange([...value, ...pastedTags])
     }
   }
 
   return (
     <div className='w-full max-w-xl space-y-2'>
-      <div className='flex flex-wrap gap-2 p-2 min-h-10 rounded-md border '>
-        {tags.map((tag) => (
+      <div className='flex flex-wrap gap-2 p-2 min-h-10 rounded-md border'>
+        {value.map((tag) => (
           <Badge key={tag} variant='secondary' className='flex items-center gap-1 px-2 py-1'>
             #{tag}
             <X size={14} className='cursor-pointer hover:text-destructive' onClick={() => removeTag(tag)} />

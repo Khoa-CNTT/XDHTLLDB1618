@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react'
+import React, { Dispatch, SetStateAction, useEffect } from 'react'
 import { genAISettingSchema, GenAISettingSchema } from '@/schema-validations/genAI'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -12,9 +12,10 @@ import { Switch } from '../ui/switch'
 interface Props {
   setStep: Dispatch<SetStateAction<number>>
   setSettings: Dispatch<SetStateAction<GenAISettingSchema>>
+  currentSettings: GenAISettingSchema
 }
 
-export default function AiSetting({ setStep, setSettings }: Props) {
+export default function AiSetting({ setStep, setSettings, currentSettings }: Props) {
   const TONE_OPTIONS = [
     {
       value: 'funny',
@@ -39,9 +40,10 @@ export default function AiSetting({ setStep, setSettings }: Props) {
   ]
   const form = useForm<GenAISettingSchema>({
     defaultValues: {
-      tone: 'professional',
-      isUseEmoji: false,
-      isUseHashtags: false
+      tone: currentSettings.tone || 'professional',
+      isUseEmoji: currentSettings.isUseEmoji || false,
+      isUseHashtags: currentSettings.isUseHashtags || false,
+      responseFormat: currentSettings.responseFormat || ''
     },
     resolver: zodResolver(genAISettingSchema)
   })
@@ -56,6 +58,12 @@ export default function AiSetting({ setStep, setSettings }: Props) {
     e.stopPropagation()
     form.handleSubmit(onInnerSubmit)(e)
   }
+
+  useEffect(() => {
+    const { tone, isUseEmoji, isUseHashtags, responseFormat } = currentSettings
+    form.reset({ tone, isUseEmoji, isUseHashtags, responseFormat })
+  }, [currentSettings, form])
+
   return (
     <Form {...form}>
       <form className='space-y-8' onSubmit={handleSubmit}>
@@ -64,10 +72,10 @@ export default function AiSetting({ setStep, setSettings }: Props) {
             control={form.control}
             name='tone'
             render={({ field }) => (
-              <FormItem {...field}>
+              <FormItem>
                 <FormLabel className='mb-2 text-md font-bold'>Tone</FormLabel>
                 <FormControl>
-                  <Select>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger className='w-[180px]'>
                       <SelectValue placeholder='Select a tone' />
                     </SelectTrigger>
@@ -91,10 +99,10 @@ export default function AiSetting({ setStep, setSettings }: Props) {
             control={form.control}
             name='isUseEmoji'
             render={({ field }) => (
-              <FormItem {...field} className='flex flex-col'>
+              <FormItem className='flex flex-col'>
                 <FormLabel className='mb-2 text-md font-bold'>Use Emoji</FormLabel>
                 <FormControl>
-                  <Switch />
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}
@@ -103,10 +111,10 @@ export default function AiSetting({ setStep, setSettings }: Props) {
             control={form.control}
             name='isUseHashtags'
             render={({ field }) => (
-              <FormItem {...field} className='flex flex-col'>
+              <FormItem className='flex flex-col'>
                 <FormLabel className='mb-2 text-md font-bold'>Use Hashtags</FormLabel>
                 <FormControl>
-                  <Switch />
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}
@@ -116,10 +124,10 @@ export default function AiSetting({ setStep, setSettings }: Props) {
           control={form.control}
           name='responseFormat'
           render={({ field }) => (
-            <FormItem {...field} className='flex flex-col'>
+            <FormItem className='flex flex-col'>
               <FormLabel className='mb-2 text-md font-bold'>How would you like AI Assistant to respond?</FormLabel>
               <FormControl>
-                <Input placeholder='e.g. write in the first person, respond as a pirate, etc.' />
+                <Input {...field} placeholder='e.g. write in the first person, respond as a pirate, etc.' />
               </FormControl>
             </FormItem>
           )}
