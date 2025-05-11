@@ -1,26 +1,46 @@
 'use client'
 
 import { useCallback, useRef } from 'react'
+import { Platform } from '@/constants/credentials'
 import { format } from 'date-fns'
 import html2canvas from 'html2canvas-pro'
 import { Download } from 'lucide-react'
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 
-import { Statistical } from '@/types/utils'
 import { Button } from '@/components/ui/button'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 
 const chartConfig = {
-  engagement: {
-    label: 'Engagement',
+  value: {
+    label: 'value',
     color: 'hsl(var(--chart-1))'
+  },
+  facebook: {
+    label: 'Facebook',
+    color: 'hsl(var(--chart-1))'
+  },
+  instagram: {
+    label: 'Instagram',
+    color: 'hsl(var(--chart-2))'
+  },
+  x: {
+    label: 'X',
+    color: 'hsl(var(--chart-3))'
+  },
+  threads: {
+    label: 'Threads',
+    color: 'hsl(var(--chart-4))'
+  },
+  reddit: {
+    label: 'Reddit',
+    color: 'hsl(var(--chart-5))'
   }
 } satisfies ChartConfig
 
-export function BestPostingTimesChart({ data }: { data: Statistical['postsByTimeRange'] }) {
+export function EngagementMetricsChart({ platform, data }: { platform: Platform; data: { [key: string]: number } }) {
   const chartData = Object.entries(data).map(([key, value]) => ({
-    time: key,
-    engagement: value
+    name: key,
+    value: value
   }))
 
   const chartRef = useRef<HTMLDivElement>(null)
@@ -47,33 +67,33 @@ export function BestPostingTimesChart({ data }: { data: Statistical['postsByTime
         y: -padding
       })
       const link = document.createElement('a')
-      link.download = `best-posting-times-${format(new Date(), 'yyyy-MM-dd')}.png`
+      link.download = `engagement-metrics-${platform}-${format(new Date(), 'yyyy-MM-dd')}.png`
       link.href = canvas.toDataURL()
       link.click()
     }
-  }, [])
+  }, [platform])
 
   return (
     <div className='relative'>
-      <div className='absolute -top-16 right-0 z-10'>
+      <div className='absolute -top-28 right-0 z-10'>
         <Button variant='outline' size='icon' onClick={handleExportChart} title='Export as image'>
           <Download className='size-4' />
         </Button>
       </div>
       <div ref={chartRef}>
-        <ChartContainer config={chartConfig} className='w-full max-h-96'>
-          <BarChart data={chartData} accessibilityLayer>
-            <CartesianGrid vertical={false} />
-            <XAxis dataKey='time' tickLine={false} tickMargin={10} axisLine={false} interval={0} className='text-xs' />
-            <YAxis
-              tickFormatter={(value) => `${value.toLocaleString()}`}
-              className='text-xs'
-              allowDecimals={false}
-              domain={[0, 10]}
-              ticks={[0, 2, 4, 6, 8, 10]}
-            />
+        <ChartContainer config={chartConfig}>
+          <BarChart
+            accessibilityLayer
+            data={chartData}
+            layout='vertical'
+            margin={{
+              left: 20
+            }}
+          >
+            <XAxis type='number' dataKey='value' />
+            <YAxis dataKey='name' type='category' tickLine={false} tickMargin={10} axisLine={false} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey='engagement' fill='var(--color-engagement)' radius={8} />
+            <Bar dataKey='value' fill={chartConfig[platform as keyof typeof chartConfig].color} radius={5} />
           </BarChart>
         </ChartContainer>
       </div>

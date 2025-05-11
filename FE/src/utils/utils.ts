@@ -1,4 +1,4 @@
-import { FaFacebook, FaInstagram } from 'react-icons/fa'
+import { FaFacebook, FaInstagram, FaReddit } from 'react-icons/fa'
 import { FaThreads } from 'react-icons/fa6'
 import { RiTwitterXLine } from 'react-icons/ri'
 
@@ -55,5 +55,7 @@ export const getIconPlatform = (platform: string) => {
       return FaThreads
     case 'x':
       return RiTwitterXLine
+    case 'reddit':
+      return FaReddit
   }
 }

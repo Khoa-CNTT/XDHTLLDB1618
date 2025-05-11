@@ -1,6 +1,8 @@
 'use client'
 
+import { usePathname, useRouter } from 'next/navigation'
 import { SIDE_BAR } from '@/constants'
+import path from '@/constants/path'
 import { useAppContext } from '@/contexts/app-context'
 import { GalleryVerticalEnd, Plus } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -22,7 +24,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open: sidebarOpen } = useSidebar()
   const { setOpenCreateScheduleModal } = useAppContext()
   const t = useTranslations('common')
-
+  const pathname = usePathname()
+  const isActive = pathname === path.schedules
+  const router = useRouter()
   return (
     <Sidebar collapsible='icon' {...props}>
       <SidebarHeader>
@@ -41,7 +45,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuButton
             tooltip='Create post'
             className='bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground/90 justify-center active:bg-primary/90 active:text-primary-foreground/90'
-            onClick={() => setOpenCreateScheduleModal(true)}
+            onClick={() => {
+              if (isActive) {
+                setOpenCreateScheduleModal(true)
+              } else {
+                router.push(path.schedules)
+              }
+            }}
           >
             {sidebarOpen && <span className='h-5'>{t('createPost')}</span>}
             <Plus />

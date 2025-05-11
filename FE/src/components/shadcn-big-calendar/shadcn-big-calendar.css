@@ -156,9 +156,10 @@ button.rbc-input::-moz-focus-inner {
 .rbc-event {
   background-color: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
-  padding: 5px;
   border-radius: var(--radius);
   cursor: pointer;
+  height: 60px !important;
+  @apply p-[2px] sm:p-[5px];
 }
 .rbc-slot-selecting .rbc-event {
   cursor: inherit;
@@ -210,13 +211,17 @@ button.rbc-input::-moz-focus-inner {
   background-color: rgba(0, 0, 0, 0.1);
 }
 .rbc-show-more {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: #808080;
+  color: #fff;
   z-index: 4;
   font-weight: bold;
   font-size: 85%;
   height: auto;
   line-height: normal;
   white-space: nowrap;
+  position: absolute;
+  top: 0;
+  @apply w-[50px] sm:w-max;
 }
 .rbc-month-view {
   position: relative;
@@ -309,6 +314,8 @@ button.rbc-input::-moz-focus-inner {
   border: 1px solid hsl(var(--border));
   background-color: hsl(var(--card));
   padding: 10px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 .rbc-overlay > * + * {
   margin-top: 1px;

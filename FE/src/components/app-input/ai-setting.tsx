@@ -132,7 +132,7 @@ export default function AiSetting({ setStep, setSettings, currentSettings }: Pro
             </FormItem>
           )}
         />
-        <Button type='submit' className='mt-8 block ml-auto'>
+        <Button type='submit' className='block ml-auto'>
           Save settings
         </Button>
       </form>

@@ -16,7 +16,8 @@ const configs = {
   instagramAppId: (process.env.NEXT_PUBLIC_INSTAGRAM_APP_ID as string) || '',
   instagramAppSecret: (process.env.NEXT_PUBLIC_INSTAGRAM_APP_SECRET as string) || '',
   instagramRedirectUri: (process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI as string) || '',
-  telegramBotName: (process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME as string) || ''
+  telegramBotName: (process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME as string) || '',
+  socketUrl: (process.env.NEXT_PUBLIC_SOCKET_URL as string) || ''
 }
 
 export default configs

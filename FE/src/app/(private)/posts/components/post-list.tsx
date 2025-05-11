@@ -25,6 +25,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import ElementEffect from '@/components/effects/element-effect'
 import ElementEffectStagger from '@/components/effects/element-effect-stagger'
 
+import EmptyPost from './empty-post'
+
 export function PostList({
   status,
   postsPromise
@@ -148,7 +150,7 @@ export function PostList({
         ))}
       {groupedPosts && Object.keys(groupedPosts).length === 0 && (
         <div className='text-center py-12'>
-          <p className='text-muted-foreground'>No posts found</p>
+          <EmptyPost />
         </div>
       )}
     </div>

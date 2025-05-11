@@ -13,7 +13,16 @@ export const postSchema = z.object({
   scheduledTime: z.string().min(1, { message: 'Time is required' }),
   images: z.array(ImagePreviewSchema).optional(),
   scheduleAll: z.boolean().optional(),
-  selectedPages: z.array(z.string()).optional()
+  selectedPages: z.array(z.string()).optional(),
+  isRecurring: z.boolean().default(false),
+  recurringType: z.enum(['daily', 'weekly']).default('daily'),
+  recurringDays: z.array(z.string()).default([]),
+  recurringDateRange: z
+    .object({
+      from: z.date().optional(),
+      to: z.date().optional()
+    })
+    .optional()
 })
 
 export type PostSchema = z.infer<typeof postSchema>

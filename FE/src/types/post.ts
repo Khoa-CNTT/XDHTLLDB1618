@@ -40,3 +40,44 @@ export type CreatePostRequest = {
     }
   }[]
 }
+
+export type RecurringPost = {
+  id: string
+  frequency: 'daily' | 'weekly'
+  daysOfWeek?: number[]
+  startDate: string
+  endDate: string
+  status: string
+  lastScheduledDate: string
+  metadata: {
+    type: string
+    content: string
+    assets: {
+      type: string
+      url: string
+    }[]
+    [key: string]: any
+  }
+  platform: string
+  publicationTime: string
+  socialCredentialID: string
+  socialCredential: any
+}
+export type CreateRecurringRequest = {
+  socialPosts: {
+    platform: string
+    socialCredentialID: string
+    metadata: {
+      type: string
+      content: string
+      assets: { type: string; url: string }[]
+    }
+  }[]
+  publicationTime: string
+  recurring: {
+    frequency: 'daily' | 'weekly'
+    daysOfWeek?: number[]
+    startDate: string
+    endDate: string
+  }
+}

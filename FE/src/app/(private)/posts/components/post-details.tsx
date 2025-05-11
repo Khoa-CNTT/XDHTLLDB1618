@@ -1,12 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { Platform } from '@/constants/credentials'
 import { FADE_IN_ANIMATION } from '@/constants/effects'
 import { dummyComments } from '@/data/post.dummy'
 import { toCapitalize } from '@/utils/utils'
 import { format } from 'date-fns'
-import { ArrowLeft, Calendar, Clock, MessageCircle, Share2, ThumbsUp } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, MessageCircle, Share2, ThumbsUp, User } from 'lucide-react'
+import { FaRetweet } from 'react-icons/fa'
 
 import { Post } from '@/types/post'
 import { cn } from '@/lib/utils'
@@ -30,21 +33,61 @@ const platformColors: Record<string, string> = {
   reddit: 'bg-gradient-to-r from-[#ff4500] to-[#ffa500]'
 }
 
+const renderComment = (post: Post) => {
+  const comments = post?.publishedPost?.metadata?.comments?.data || post?.publishedPost?.metadata?.comments || []
+  return (
+    comments.length > 0 && (
+      <ElementEffect animationProps={FADE_IN_ANIMATION}>
+        <Card>
+          <CardContent className='p-6'>
+            <h2 className='text-xl font-semibold mb-4'>Comments</h2>
+
+            <div className='space-y-6'>
+              {comments?.map((comment: any, index: number) => (
+                <div key={comment.id ?? index} className='flex gap-4'>
+                  <Avatar className='size-10'>
+                    <AvatarImage src={comment?.from?.picture?.data?.url ?? ''} />
+                    <AvatarFallback className={cn('text-white', platformColors[post.platform])}>
+                      {comment?.from?.name.charAt(0) || comment?.username?.charAt(0) || <User className='size-4' />}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className='flex-1'>
+                    <div className='flex items-center gap-2 mb-1'>
+                      <span className='font-semibold'>
+                        {comment?.from?.name || comment?.username || `${toCapitalize(post.platform)} user`}
+                      </span>
+                      <span className='text-sm text-muted-foreground'>
+                        {format(comment?.created_time || comment?.timestamp || '', "MMM d, yyyy 'at' h:mm a")}
+                      </span>
+                    </div>
+                    <p className='text-sm'>{comment?.message || comment?.text || ''}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </ElementEffect>
+    )
+  )
+}
+
 export default function PostDetails({ post }: PostDetailsProps) {
   const pathname = usePathname()
   const platform = pathname.split('/')[2]
+  const router = useRouter()
+
+  console.log(post)
 
   return (
     <div className='min-h-screen bg-muted'>
       <div className='container mx-auto py-8'>
         <div className='max-w-4xl mx-auto'>
           <ElementEffect animationProps={FADE_IN_ANIMATION}>
-            <Link href={`/posts/${platform}`}>
-              <Button variant='default' className='mb-6'>
-                <ArrowLeft className='mr-2 size-4' />
-                Back to Posts
-              </Button>
-            </Link>
+            <Button variant='default' className='mb-6' onClick={() => router.back()}>
+              <ArrowLeft className='size-4' />
+              Back
+            </Button>
           </ElementEffect>
 
           <ElementEffect animationProps={FADE_IN_ANIMATION}>
@@ -91,8 +134,8 @@ export default function PostDetails({ post }: PostDetailsProps) {
                   <div className='pt-2 pb-1'>
                     <p className='text-xs flex gap-1 items-center'>
                       <ThumbsUp className='size-3' />
-                      <span className='italic'>{post?.publishedPost?.metadata?.likes[0].name}</span>{' '}
-                      {post?.publishedPost?.metadata?.likes.length > 1 && 'and others'}
+                      <span className='italic'>{post?.publishedPost?.metadata?.likes[0]?.name}</span>{' '}
+                      {post?.publishedPost?.metadata?.likes?.length > 1 && 'and others'}
                     </p>
                   </div>
                 )}
@@ -102,49 +145,40 @@ export default function PostDetails({ post }: PostDetailsProps) {
                     <ThumbsUp className='mr-2 size-4' />
                     Like
                     <Badge variant='default' className='ml-2 rounded-md'>
-                      {post?.publishedPost?.metadata?.likes?.length ?? 0}
+                      {post?.publishedPost?.metadata?.likes || post?.publishedPost?.metadata?.likes?.length || 0}
                     </Badge>
                   </Button>
                   <Button variant='outline' className='flex-1'>
                     <MessageCircle className='mr-2 size-4' />
                     Comment
+                    <Badge variant='default' className='ml-2 rounded-md'>
+                      {post?.publishedPost?.metadata?.comments || post?.publishedPost?.metadata?.comments?.length || 0}
+                    </Badge>
                   </Button>
-                  <Button variant='outline' className='flex-1'>
-                    <Share2 className='mr-2 size-4' />
-                    Share
-                  </Button>
+                  {post.platform !== Platform.X && (
+                    <Button variant='outline' className='flex-1'>
+                      <Share2 className='mr-2 size-4' />
+                      Share
+                      <Badge variant='default' className='ml-2 rounded-md'>
+                        {post?.publishedPost?.metadata?.shares?.length ?? 0}
+                      </Badge>
+                    </Button>
+                  )}
+                  {post.platform === Platform.X && (
+                    <Button variant='outline' className='flex-1'>
+                      <FaRetweet className='mr-2 size-4' />
+                      Retweet
+                      <Badge variant='default' className='ml-2 rounded-md'>
+                        {post?.publishedPost?.metadata?.retweets ?? 0}
+                      </Badge>
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </ElementEffect>
 
-          <ElementEffect animationProps={FADE_IN_ANIMATION}>
-            <Card>
-              <CardContent className='p-6'>
-                <h2 className='text-xl font-semibold mb-4'>Comments</h2>
-
-                <div className='space-y-6'>
-                  {dummyComments.map((comment) => (
-                    <div key={comment.id} className='flex gap-4'>
-                      <Avatar className='size-10'>
-                        <AvatarImage src={comment?.author?.image ?? ''} />
-                        <AvatarFallback>{comment?.author?.name?.[0] ?? ''}</AvatarFallback>
-                      </Avatar>
-                      <div className='flex-1'>
-                        <div className='flex items-center gap-2 mb-1'>
-                          <span className='font-semibold'>{comment.author.name}</span>
-                          <span className='text-sm text-muted-foreground'>
-                            {format(comment?.createdAt ?? '', "MMM d, yyyy 'at' h:mm a")}
-                          </span>
-                        </div>
-                        <p className='text-sm'>{comment?.content ?? ''}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </ElementEffect>
+          {renderComment(post)}
         </div>
       </div>
     </div>

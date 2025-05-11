@@ -4,13 +4,17 @@ import { SetStateAction, useState } from 'react'
 import { useAppContext } from '@/contexts/app-context'
 import { useGetPosts } from '@/queries/post'
 import { getCustomEventStyle } from '@/utils/calendar'
+import { useQueryClient } from '@tanstack/react-query'
+import { AxiosResponse } from 'axios'
 import moment from 'moment'
 import { momentLocalizer, SlotInfo, Views } from 'react-big-calendar'
 
 import { Credential } from '@/types/credentials'
 import { Post } from '@/types/post'
+import { SuccessResponse } from '@/types/utils'
 import { toast } from '@/hooks/use-toast'
 import ShadcnBigCalendar from '@/components/shadcn-big-calendar/shadcn-big-calendar'
+import { SocketListener } from '@/components/socket-listener'
 
 import EventCard from '../../../components/calendar/event-card'
 import CreatePostModal from './create-post-modal'
@@ -32,6 +36,7 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
   const [date, setDate] = useState(new Date())
 
   const { data: posts } = useGetPosts()
+  const queryClient = useQueryClient()
 
   const events = posts?.data.data.map((post) => ({
     ...post,
@@ -75,6 +80,61 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
     setOpenCreateScheduleModal(true)
   }
 
+  const handlePostProcessed = (data: {
+    postId?: string
+    status: string
+    timestamp: string
+    post?: Post
+    virtualId?: string
+  }) => {
+    queryClient.setQueryData(['posts'], (oldData: AxiosResponse<SuccessResponse<Post[]>>) => {
+      console.log(data)
+      if (!oldData?.data?.data) return oldData
+      const postIndex = oldData.data.data.findIndex(
+        (post: Post) => post.id === data?.postId || post.id === data?.virtualId
+      )
+
+      const newData = [...oldData.data.data]
+      newData[postIndex] = { ...newData[postIndex], status: data.status }
+
+      return {
+        ...oldData,
+        data: {
+          ...oldData.data,
+          data: newData
+        }
+      }
+    })
+  }
+
+  const handlePostFailed = (data: {
+    postId: string
+    status: string
+    error: string
+    timestamp: string
+    post?: Post
+    virtualId?: string
+  }) => {
+    queryClient.setQueryData(['posts'], (oldData: AxiosResponse<SuccessResponse<Post[]>>) => {
+      if (!oldData?.data?.data) return oldData
+
+      const postIndex = oldData.data.data.findIndex(
+        (post: Post) => post.id === data?.postId || post.id === data?.virtualId
+      )
+
+      const newData = [...oldData.data.data]
+      newData[postIndex] = { ...newData[postIndex], status: data.status }
+
+      return {
+        ...oldData,
+        data: {
+          ...oldData.data,
+          data: newData
+        }
+      }
+    })
+  }
+
   return (
     <main className='p-8 pt-0'>
       <ShadcnBigCalendar
@@ -100,6 +160,12 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
           event: ({ event }) => <EventCard event={event} />
         }}
         dayLayoutAlgorithm='no-overlap'
+        popup
+        messages={{
+          showMore: (count, remainingEvents, events) => {
+            return `+${count} more`
+          }
+        }}
       />
 
       <CreatePostModal
@@ -108,6 +174,8 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
         credentials={credentials}
         time={time}
       />
+
+      <SocketListener onPostProcessed={handlePostProcessed} onPostFailed={handlePostFailed} />
     </main>
   )
 }

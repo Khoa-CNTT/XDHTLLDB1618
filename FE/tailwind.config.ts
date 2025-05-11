@@ -11,6 +11,10 @@ export default {
   theme: {
     extend: {
       colors: {
+        success: 'hsl(var(--success))',
+        'success-foreground': 'hsl(var(--success-foreground))',
+        info: 'hsl(var(--info))',
+        'info-foreground': 'hsl(var(--info-foreground))',
         facebook: 'var(--facebook)',
         threads: 'var(--threads)',
         instagram: 'var(--instagram)',
@@ -119,5 +123,5 @@ export default {
       }
     }
   },
-  plugins: [require('tailwindcss-animate')]
+  plugins: [require('tailwindcss-animate'), require('tailwind-scrollbar')]
 } satisfies Config

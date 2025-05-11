@@ -17,12 +17,27 @@ export interface SuccessResponse<Data> {
 }
 
 export interface Statistical {
-  totalPosts: number
   postsByPlatform: {
     [key in keyof typeof Platform]: number
   }
   recentPosts: Post[]
   postsByTimeRange: {
     [key: string]: number
+  }
+  postByStatusResult: {
+    [key: string]: {
+      [key: string]: number
+    }
+  }
+  engagementData: {
+    [key: string]: {
+      [key: string]: number
+    }
+  }
+  overallMetrics: {
+    totalPosts: number
+    totalEngagements: string
+    scheduledPosts: number
+    averageReach: string
   }
 }

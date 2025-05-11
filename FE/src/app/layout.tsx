@@ -11,6 +11,7 @@ import { cookies } from 'next/headers'
 import { TokenType } from '@/constants/token'
 import AppProvider from '@/providers/app-provider'
 import ReactQueryClientProvider from '@/providers/query-client-provider'
+import { SocketProvider } from '@/providers/socket-provider'
 import { getMessages } from 'next-intl/server'
 
 import { Toaster } from '@/components/ui/toaster'
@@ -54,13 +55,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <body className={`${inter.className} antialiased overflow-x-hidden`}>
           <ThemeProvider attribute='class' defaultTheme='system'>
             <ReactQueryClientProvider>
-              <AppProvider accessToken={accessToken} isSyncAuthenticated={isSyncAuthenticated}>
-                <NextIntlClientProvider messages={messages}>
-                  <NextTopLoader />
-                  {children}
-                </NextIntlClientProvider>
-                <Toaster />
-              </AppProvider>
+              <SocketProvider>
+                <AppProvider accessToken={accessToken} isSyncAuthenticated={isSyncAuthenticated}>
+                  <NextIntlClientProvider messages={messages}>
+                    <NextTopLoader />
+                    {children}
+                  </NextIntlClientProvider>
+                  <Toaster />
+                </AppProvider>
+              </SocketProvider>
             </ReactQueryClientProvider>
           </ThemeProvider>
         </body>

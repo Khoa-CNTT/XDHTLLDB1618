@@ -42,6 +42,10 @@
     --instagram: 253, 126, 20;
     --reddit: 255, 69, 0;
     --x: 29, 161, 242;
+    --success: 142 72% 29%;
+    --success-foreground: 144 70% 98%;
+    --info: 221 83% 53%;
+    --info-foreground: 213 96% 98%;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -81,6 +85,10 @@
     --instagram: 255, 146, 0;
     --reddit: 255, 69, 0;
     --x: 0, 172, 255;
+    --success: 142 70% 48%;
+    --success-foreground: 144 70% 10%;
+    --info: 217 91% 60%;
+    --info-foreground: 213 96% 10%;
   }
 }
 

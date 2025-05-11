@@ -5,7 +5,8 @@ import { CreatePostRequest } from '@/types/post'
 
 export const useGetPosts = (params?: GetPostsParams) => {
   return useQuery({
-    queryKey: ['posts', params],
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: params ? ['posts', params] : ['posts'],
     queryFn: () => postApi.getPosts(params)
   })
 }

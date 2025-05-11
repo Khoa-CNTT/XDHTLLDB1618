@@ -255,7 +255,7 @@ const AIDialog = ({ onContentChange, text }: Props) => {
       <PopoverTrigger asChild>
         <Sparkles className='text-yellow-400 size-5' />
       </PopoverTrigger>
-      <PopoverContent className='w-[600px]' align='start'>
+      <PopoverContent className='w-[600px]' align='start' side={state.step === 1 ? 'bottom' : 'right'}>
         <div className='flex justify-between items-center w-full mb-4'>
           <ArrowLeft
             onClick={() => dispatch({ type: 'SET_STEP', payload: 1 })}
