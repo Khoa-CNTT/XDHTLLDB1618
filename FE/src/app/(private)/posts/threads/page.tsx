@@ -1,7 +1,9 @@
+import { getTabStatus } from '@/actions/tab-status'
 import { PLATFORM_TYPE } from '@/constants'
 
 import PostListWrapper from '@/app/(private)/posts/components/post-list-wrapper'
 
-export default function PostsInstagramPage() {
-  return <PostListWrapper platform={PLATFORM_TYPE.THREADS} />
+export default async function PostsThreadsPage() {
+  const tabStatus = await getTabStatus()
+  return <PostListWrapper platform={PLATFORM_TYPE.THREADS} tabStatus={tabStatus} />
 }

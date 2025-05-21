@@ -16,6 +16,14 @@ export const useAppContext = create<{
   reset: () => set({ openCreateScheduleModal: false, post: undefined })
 }))
 
+export const useLanguageContext = create<{
+  language: string
+  setLanguage: (language: string) => void
+}>((set) => ({
+  language: 'en',
+  setLanguage: (language) => set({ language })
+}))
+
 export const useAuthContext = create<{
   accessToken?: string | null
   setAccessToken: (token?: string | null) => void

@@ -1,3 +1,4 @@
+ 
 'use client'
 
 import { useCallback, useRef } from 'react'
@@ -5,6 +6,7 @@ import { Platform } from '@/constants/credentials'
 import { format } from 'date-fns'
 import html2canvas from 'html2canvas-pro'
 import { Download } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 
 import { Button } from '@/components/ui/button'
@@ -38,8 +40,9 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function EngagementMetricsChart({ platform, data }: { platform: Platform; data: { [key: string]: number } }) {
+  const t = useTranslations('dashboard')
   const chartData = Object.entries(data).map(([key, value]) => ({
-    name: key,
+    name: t(key),
     value: value
   }))
 

@@ -6,6 +6,7 @@ import path from '@/constants/path'
 import { getIconPlatform, toCapitalize } from '@/utils/utils'
 import { format } from 'date-fns'
 import { ArrowDownRight, ArrowUpRight, BarChartIcon, Calendar, ChevronDown, FileText, Users } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 import { IconType } from 'react-icons'
 import { FaFacebook, FaInstagram } from 'react-icons/fa'
 import { FaThreads } from 'react-icons/fa6'
@@ -40,28 +41,29 @@ export default async function DashboardPage() {
   const cookieStores = await cookies()
   const accessToken = cookieStores.get('accessToken')?.value ?? ''
   const statisticalData = await statisticalApi.getStatisticalServer(accessToken)
+  const t = await getTranslations('dashboard')
 
   const recentPosts = statisticalData.data.data.recentPosts
 
   return (
     <main className='p-6'>
       <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-2xl font-bold'>Analytics Dashboard</h1>
+        <h1 className='text-2xl font-bold'>{t('title')}</h1>
 
         <div className='flex items-center gap-2'>
-          <Select value='last-7-days'>
+          {/* <Select value='last-7-days'>
             <SelectTrigger className='w-[180px] border-foreground'>
               <SelectValue placeholder='Select date range' />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='today'>Today</SelectItem>
-              <SelectItem value='yesterday'>Yesterday</SelectItem>
-              <SelectItem value='last-7-days'>Last 7 days</SelectItem>
-              <SelectItem value='last-30-days'>Last 30 days</SelectItem>
-              <SelectItem value='this-month'>This month</SelectItem>
-              <SelectItem value='last-month'>Last month</SelectItem>
+              <SelectItem value='today'>{t('today')}</SelectItem>
+              <SelectItem value='yesterday'>{t('yesterday')}</SelectItem>
+              <SelectItem value='last-7-days'>{t('last7Days')}</SelectItem>
+              <SelectItem value='last-30-days'>{t('last30Days')}</SelectItem>
+              <SelectItem value='this-month'>{t('thisMonth')}</SelectItem>
+              <SelectItem value='last-month'>{t('lastMonth')}</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
 
           <Export />
         </div>
@@ -71,13 +73,13 @@ export default async function DashboardPage() {
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
         <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader className='pb-2'>
-            <CardTitle className='text-sm font-medium '>Total Posts</CardTitle>
+            <CardTitle className='text-sm font-medium '>{t('totalPosts')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className='flex justify-between items-end'>
               <div>
                 <div className='text-2xl font-bold'>{statisticalData.data.data.overallMetrics.totalPosts}</div>
-                <div className='text-xs text-green-500'>Across all platforms</div>
+                <div className='text-xs text-green-500'>{t('acrossAllPlatforms')}</div>
               </div>
               <FileText className='size-6' />
             </div>
@@ -86,13 +88,13 @@ export default async function DashboardPage() {
 
         <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader className='pb-2'>
-            <CardTitle className='text-sm font-medium'>Total Engagements</CardTitle>
+            <CardTitle className='text-sm font-medium'>{t('totalEngagements')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className='flex justify-between items-end'>
               <div>
                 <div className='text-2xl font-bold'>{statisticalData.data.data.overallMetrics.totalEngagements}</div>
-                <div className='text-xs text-green-500'>Likes, comments & shares, ...</div>
+                <div className='text-xs text-green-500'>{t('likesShareComments')}</div>
               </div>
               <Users className='size-6' />
             </div>
@@ -101,13 +103,13 @@ export default async function DashboardPage() {
 
         <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader className='pb-2'>
-            <CardTitle className='text-sm font-medium '>Scheduled Posts</CardTitle>
+            <CardTitle className='text-sm font-medium '>{t('scheduledPosts')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className='flex justify-between items-end'>
               <div>
                 <div className='text-2xl font-bold'>{statisticalData.data.data.overallMetrics.scheduledPosts}</div>
-                <div className='text-xs text-green-500'>Pending to publish</div>
+                <div className='text-xs text-green-500'>{t('pendingToPublish')}</div>
               </div>
               <Calendar className='size-6' />
             </div>
@@ -116,13 +118,13 @@ export default async function DashboardPage() {
 
         <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader className='pb-2'>
-            <CardTitle className='text-sm font-medium '>Avg. Reach</CardTitle>
+            <CardTitle className='text-sm font-medium '>{t('avgReach')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className='flex justify-between items-end'>
               <div>
                 <div className='text-2xl font-bold'>{statisticalData.data.data.overallMetrics.averageReach}</div>
-                <div className='text-xs text-green-500'>Views per post</div>
+                <div className='text-xs text-green-500'>{t('viewsPerPost')}</div>
               </div>
               <BarChartIcon className='size-6' />
             </div>
@@ -134,8 +136,8 @@ export default async function DashboardPage() {
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
         <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader>
-            <CardTitle>Engagement Metrics by Platform</CardTitle>
-            <CardDescription className=''>Total interactions across different social media platforms</CardDescription>
+            <CardTitle>{t('metricsChartTitle')}</CardTitle>
+            <CardDescription className=''>{t('metricsChartDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue='facebook'>
@@ -152,9 +154,9 @@ export default async function DashboardPage() {
                 <TabsTrigger value='threads' className='flex-1'>
                   Threads
                 </TabsTrigger>
-                <TabsTrigger value='reddit' className='flex-1'>
+                {/* <TabsTrigger value='reddit' className='flex-1'>
                   Reddit
-                </TabsTrigger>
+                </TabsTrigger> */}
               </TabsList>
               <TabsContent value='facebook'>
                 <EngagementMetricsChart
@@ -180,20 +182,20 @@ export default async function DashboardPage() {
                   data={statisticalData.data.data.engagementData.threadsEngagementData}
                 />
               </TabsContent>
-              <TabsContent value='reddit'>
+              {/* <TabsContent value='reddit'>
                 <EngagementMetricsChart
                   platform={Platform.REDDIT}
                   data={statisticalData.data.data.engagementData.redditEngagementData}
                 />
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
           </CardContent>
         </Card>
 
         <Card className='border-primary dark:border-primary/20 bg-muted/10 flex flex-col'>
           <CardHeader>
-            <CardTitle>Platform Distribution</CardTitle>
-            <CardDescription className=''>Posts by social media platform</CardDescription>
+            <CardTitle>{t('distributionChartTitle')}</CardTitle>
+            <CardDescription className=''>{t('distributionChartDescription')}</CardDescription>
           </CardHeader>
           <CardContent className='flex-1'>
             <PlatformDistributionChart data={statisticalData.data.data.postsByPlatform} />
@@ -204,16 +206,21 @@ export default async function DashboardPage() {
       {/* Platform Performance */}
       <Card className='border-primary dark:border-primary/20 bg-muted/10 mb-6'>
         <CardHeader>
-          <CardTitle>Post Performance</CardTitle>
-          <CardDescription className=''>Post engagement over time</CardDescription>
+          <CardTitle>{t('performanceChartTitle')}</CardTitle>
+          <CardDescription className=''>{t('performanceChartDescription')}</CardDescription>
         </CardHeader>
         <CardContent className='space-y-6'>
           <PostStatusChart data={statisticalData.data.data.postByStatusResult} />
           <Separator />
           <div className='space-y-4'>
             {Object.entries(statisticalData.data.data.postsByPlatform).map(([platform, count]) => {
+              if (platform === 'reddit') {
+                return null
+              }
               const PlatformIcon = getIconPlatform(platform) as IconType
-              const percentage = (count / statisticalData.data.data.overallMetrics.totalPosts) * 100
+              const totalPosts = statisticalData.data.data.overallMetrics.totalPosts || 1
+              const percentage = (count / totalPosts) * 100
+
               return (
                 <div key={platform} className='flex items-center'>
                   <div
@@ -246,8 +253,8 @@ export default async function DashboardPage() {
       {/* Best Posting Times */}
       <Card className='border-primary dark:border-primary/20 bg-muted/10 mb-6'>
         <CardHeader>
-          <CardTitle>Best Posting Times</CardTitle>
-          <CardDescription className=''>Engagement by time of day</CardDescription>
+          <CardTitle>{t('bestPostingTimesTitle')}</CardTitle>
+          <CardDescription className=''>{t('bestPostingTimesDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <BestPostingTimesChart data={statisticalData.data.data.postsByTimeRange} />
@@ -258,8 +265,8 @@ export default async function DashboardPage() {
       <Card className='border-primary dark:border-primary/20 bg-muted/10'>
         <CardHeader>
           <div className='flex justify-between items-center'>
-            <CardTitle>Recent Posts</CardTitle>
-            {recentPosts.length > 0 && <Button variant='default'>View All</Button>}
+            <CardTitle>{t('recentPostsTitle')}</CardTitle>
+            {recentPosts.length > 0 && <Button variant='default'>{t('viewAll')}</Button>}
           </div>
         </CardHeader>
         <CardContent>

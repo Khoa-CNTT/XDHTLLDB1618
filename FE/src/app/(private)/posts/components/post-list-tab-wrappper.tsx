@@ -1,7 +1,9 @@
 'use client'
 
+import { use } from 'react'
 import { setTabStatus } from '@/actions/tab-status'
 import { POST_STATUS } from '@/constants/post'
+import { useTranslations } from 'next-intl'
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
@@ -12,16 +14,17 @@ export interface PostListTabWrapperProps {
 }
 
 export default function PostListTabWrapper({ children, statusTabs, platform }: PostListTabWrapperProps) {
+  const t = useTranslations('posts')
   return (
     <Tabs defaultValue={statusTabs} className='w-full'>
-      <TabsList className='grid w-full max-w-[400px] grid-cols-2 mb-8'>
+      <TabsList className='grid w-full max-w-[700px] grid-cols-3 mb-8'>
         <TabsTrigger
           value={POST_STATUS.SCHEDULED}
           onClick={() => {
             setTabStatus(platform, POST_STATUS.SCHEDULED)
           }}
         >
-          Scheduled Posts
+          {t('scheduledPosts')}
         </TabsTrigger>
         <TabsTrigger
           value={POST_STATUS.PUBLISHED}
@@ -29,7 +32,15 @@ export default function PostListTabWrapper({ children, statusTabs, platform }: P
             setTabStatus(platform, POST_STATUS.PUBLISHED)
           }}
         >
-          Published Posts
+          {t('publishedPosts')}
+        </TabsTrigger>
+        <TabsTrigger
+          value={POST_STATUS.ACTIVE}
+          onClick={() => {
+            setTabStatus(platform, POST_STATUS.ACTIVE)
+          }}
+        >
+          {t('activePosts')}
         </TabsTrigger>
       </TabsList>
       {children}

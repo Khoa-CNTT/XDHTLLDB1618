@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeft, Edit2, Hash, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { flushSync } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -102,14 +103,14 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
 
   const handleDelete = (id: string) => {
     setHashtags((prev) => prev.filter((tag) => tag.id !== id))
-    toast({ title: 'Success', description: 'Hashtag deleted successfully' })
+    toast({ title: t('success'), description: t('hashtagDeleted') })
   }
 
   const onSubmit = (values: HashtagFormValues) => {
     if (editingHashtag) {
       // Update existing hashtag
       setHashtags((prev) => prev.map((tag) => (tag.id === editingHashtag.id ? { ...tag, ...values } : tag)))
-      toast({ title: 'Success', description: 'Hashtag updated successfully' })
+      toast({ title: t('success'), description: t('hashtagUpdated') })
     } else {
       // Create new hashtag
       const newHashtag: Hashtag = {
@@ -118,7 +119,7 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
         value: values.value.map((ht) => `#${ht}`)
       }
       setHashtags((prev) => [...prev, newHashtag])
-      toast({ title: 'Success', description: 'Hashtag created successfully' })
+      toast({ title: t('success'), description: t('hashtagCreated') })
     }
     setStep(1)
   }
@@ -130,16 +131,18 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
       tag.value.some((v) => v.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
+  const t = useTranslations('createPostModal')
+
   return (
     <Popover open={open} onOpenChange={onOpenChange} modal={true}>
       <PopoverTrigger asChild>
         <Hash className='size-5' />
       </PopoverTrigger>
-      <PopoverContent className='w-[600px] max-h-[450px] overflow-y-auto' align='start'>
+      <PopoverContent className='w-full lg:w-[600px] max-h-[450px] overflow-y-auto w-parent-full' align='start'>
         <div className='flex justify-between items-center w-full mb-4'>
           <ArrowLeft onClick={() => setStep(1)} className={`size-4 cursor-pointer ${step === 1 && 'opacity-0'}`} />
           <span className='text-center font-bold text-xl'>
-            {step === 1 ? 'Hashtags Manager' : `${editingHashtag ? 'Edit' : 'Create'} Hashtag`}
+            {step === 1 ? t('hashtagManager') : `${editingHashtag ? t('editHashtag') : t('createHashtag')}`}
           </span>
           <X className={`size-4 cursor-pointer ${step === 2 && 'opacity-0'}`} onClick={handleClose} />
         </div>
@@ -148,7 +151,7 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
           {step === 1 ? (
             <div>
               <Input
-                placeholder='Search hashtags'
+                placeholder={t('searchHashtags')}
                 className='mb-8'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -156,7 +159,7 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
 
               {filteredHashtags.length === 0 ? (
                 <div className='text-center text-muted-foreground'>
-                  {searchQuery ? 'No hashtags found' : 'No hashtags yet'}
+                  {searchQuery ? t('noHashtagsFound') : t('noHashtagsYet')}
                 </div>
               ) : (
                 filteredHashtags.map((tag) => (
@@ -194,7 +197,7 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
               )}
 
               <Button className='w-full mt-8' onClick={() => setStep(2)}>
-                Create new hashtags
+                {t('createHashtag')}
               </Button>
             </div>
           ) : (
@@ -212,7 +215,7 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
                   name='name'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>{t('name')}</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -226,7 +229,7 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
                   name='value'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Hashtags</FormLabel>
+                      <FormLabel>{t('hashtags')}</FormLabel>
                       <FormControl>
                         <HashtagInput value={field.value} onChange={field.onChange} />
                       </FormControl>
@@ -240,7 +243,7 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
                   name='color'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Color</FormLabel>
+                      <FormLabel>{t('color')}</FormLabel>
                       <FormControl>
                         <ColorSelector value={field.value} onChange={field.onChange} />
                       </FormControl>
@@ -251,9 +254,9 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
 
                 <div className='flex justify-end gap-2'>
                   <Button type='button' variant='outline' onClick={() => setStep(1)}>
-                    Cancel
+                    {t('cancel')}
                   </Button>
-                  <Button type='submit'>{editingHashtag ? 'Update' : 'Save'}</Button>
+                  <Button type='submit'>{editingHashtag ? t('update') : t('save')}</Button>
                 </div>
               </form>
             </Form>

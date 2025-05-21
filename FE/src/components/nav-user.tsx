@@ -8,6 +8,7 @@ import { removeTokensFromLocalStorage } from '@/utils/local-storage'
 import { useClerk, useUser } from '@clerk/nextjs'
 import { AvatarFallback } from '@radix-ui/react-avatar'
 import { BadgeCheck, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { handleErrorApi } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
@@ -32,7 +33,7 @@ export function NavUser() {
   const router = useRouter()
   const { reset: resetAuthContext } = useAuthContext()
   const { reset: resetAppContext } = useAppContext()
-
+  const t = useTranslations('navUser')
   if (!isLoaded) return null
   if (!user?.id) return null
 
@@ -46,8 +47,8 @@ export function NavUser() {
 
     try {
       const toastId = toast({
-        title: 'Logging out...',
-        description: 'Please wait while we log you out.'
+        title: t('loggingOut'),
+        description: t('pleaseWait')
       })
       await logoutMutation.mutateAsync()
       removeTokensFromLocalStorage()
@@ -103,24 +104,24 @@ export function NavUser() {
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Sparkles />
-                Upgrade to Pro
+                {t('upgradeToPro')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={() => openUserProfile()}>
                 <BadgeCheck />
-                Account
+                {t('account')}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />
-                Billing
+                {t('billing')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
-              Log out
+              {t('logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

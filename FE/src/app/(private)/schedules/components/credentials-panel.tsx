@@ -1,5 +1,6 @@
 import { PostSchema } from '@/schema-validations/post'
 import { getIconPlatform } from '@/utils/utils'
+import { useTranslations } from 'next-intl'
 import { UseFormReturn } from 'react-hook-form'
 import { IconType } from 'react-icons'
 
@@ -15,9 +16,10 @@ interface CredentialsPanelProps {
 }
 
 export const CredentialsPanel = ({ form, credentials, onScheduleAll }: CredentialsPanelProps) => {
+  const t = useTranslations('createPostModal')
   return (
     <div className='lg:w-64 border-r'>
-      <div className='p-6'>
+      <div className='px-2 md:px-6 py-6'>
         <FormField
           control={form.control}
           name='scheduleAll'
@@ -27,7 +29,7 @@ export const CredentialsPanel = ({ form, credentials, onScheduleAll }: Credentia
                 <Checkbox checked={field.value} onCheckedChange={onScheduleAll} />
               </FormControl>
               <div className='space-y-1 leading-none'>
-                <FormLabel>Schedule all</FormLabel>
+                <FormLabel>{t('scheduleAll')}</FormLabel>
               </div>
             </FormItem>
           )}
@@ -59,7 +61,7 @@ export const CredentialsPanel = ({ form, credentials, onScheduleAll }: Credentia
                       <Avatar className='size-8'>
                         <AvatarImage src={credential.metadata.avatar_url} />
                         <AvatarFallback>
-                          <PlatformIcon className='size-8' />
+                          <PlatformIcon className='size-6' />
                         </AvatarFallback>
                       </Avatar>
                       <FormLabel className='font-normal cursor-pointer flex items-center gap-2'>

@@ -20,3 +20,13 @@ export const useCreateCredentialMutation = (platform?: PlatformType) => {
     }
   })
 }
+
+export const useDisconnectSocialAccountMutation = (platform?: PlatformType) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => credentialApi.disconnectSocialAccount(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['credentials', platform] })
+    }
+  })
+}

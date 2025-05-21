@@ -3,6 +3,7 @@
 import authApis from '@/apis/auth.api'
 import configs from '@/configs'
 import { useGetTelegramStatus } from '@/queries/auth'
+import { useTranslations } from 'next-intl'
 import { FaTelegram } from 'react-icons/fa'
 import TelegramLoginButton, { TelegramUser } from 'telegram-login-button'
 
@@ -13,6 +14,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 const BOT_NAME = configs.telegramBotName
 
 export default function TelegramBot() {
+  const t = useTranslations('bot')
   const { data: telegramStatus, refetch } = useGetTelegramStatus()
   const handleTelegramResponse = async (response: TelegramUser) => {
     try {
@@ -26,13 +28,13 @@ export default function TelegramBot() {
       })
       toast({
         title: 'Success',
-        description: res.data.message ?? 'Telegram connected successfully'
+        description: res.data.message ?? t('telegramConnected')
       })
       await refetch()
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to connect Telegram'
+        description: t('telegramFailed')
       })
     }
   }
@@ -42,7 +44,7 @@ export default function TelegramBot() {
         <div className='flex items-center justify-between'>
           <CardTitle className='flex items-center'>
             <FaTelegram className='mr-2 size-7 text-blue-500' />
-            Telegram
+            {t('telegram')}
           </CardTitle>
           <span
             className={cn(
@@ -50,15 +52,13 @@ export default function TelegramBot() {
               telegramStatus?.data.linked ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
             )}
           >
-            {telegramStatus?.data.linked ? 'Connected' : 'Disconnected'}
+            {telegramStatus?.data.linked ? t('connected') : t('notConnected')}
           </span>
         </div>
-        <CardDescription>Receive notifications via Telegram bot</CardDescription>
+        <CardDescription>{t('telegramDes')}</CardDescription>
       </CardHeader>
       <CardContent className='flex-1 flex flex-col gap-4'>
-        <p className='font-medium'>
-          Connect your Telegram account to receive instant notifications about your scheduled posts.
-        </p>
+        <p className='font-medium'>{t('telegramContent')}</p>
         <TelegramLoginButton
           dataOnauth={handleTelegramResponse}
           botName={BOT_NAME}

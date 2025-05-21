@@ -4,6 +4,7 @@ import { useCallback, useRef } from 'react'
 import { format } from 'date-fns'
 import html2canvas from 'html2canvas-pro'
 import { Download } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 
 import { Statistical } from '@/types/utils'
@@ -17,27 +18,26 @@ import {
   type ChartConfig
 } from '@/components/ui/chart'
 
-// Chart configuration
-const chartConfig = {
-  published: {
-    label: 'Published',
-    color: 'hsl(var(--chart-1))'
-  },
-  scheduled: {
-    label: 'Scheduled',
-    color: 'hsl(var(--chart-2))'
-  },
-  recurring: {
-    label: 'Recurring',
-    color: 'hsl(var(--chart-3))'
-  },
-  failed: {
-    label: 'Failed',
-    color: 'hsl(var(--chart-4))'
-  }
-} satisfies ChartConfig
-
 export function PostStatusChart({ data }: { data: Statistical['postByStatusResult'] }) {
+  const t = useTranslations('dashboard')
+  const chartConfig = {
+    published: {
+      label: t('published'),
+      color: 'hsl(var(--chart-1))'
+    },
+    scheduled: {
+      label: t('scheduled'),
+      color: 'hsl(var(--chart-2))'
+    },
+    recurring: {
+      label: t('recurring'),
+      color: 'hsl(var(--chart-3))'
+    },
+    failed: {
+      label: t('failed'),
+      color: 'hsl(var(--chart-4))'
+    }
+  } satisfies ChartConfig
   const chartData = Object.keys(data.published)
     .map((date) => ({
       name: date,

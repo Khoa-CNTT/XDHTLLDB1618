@@ -32,11 +32,11 @@ export const SIDE_BAR = {
           url: path.posts_threads,
           icon: FaThreads
         },
-        {
-          title: 'Reddit',
-          url: path.posts_reddit,
-          icon: FaReddit
-        },
+        // {
+        //   title: 'Reddit',
+        //   url: path.posts_reddit,
+        //   icon: FaReddit
+        // },
         {
           title: 'X',
           url: path.posts_x,

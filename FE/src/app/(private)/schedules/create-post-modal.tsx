@@ -1,18 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 
 import { useEffect, useState } from 'react'
-import { PostType } from '@/constants/post'
+import { CHARACTER_LIMITS, PostType } from '@/constants/post'
 import { useAppContext } from '@/contexts/app-context'
 import { useUploadImagesMutation } from '@/queries/media'
-import { useCreatePostMutation } from '@/queries/post'
-import { useCreateRecurring } from '@/queries/recurring'
+import { useCreatePostMutation, useUpdatePostMutation } from '@/queries/post'
+import { useCreateRecurring, useUpdateRecurringInstanceMutation, useUpdateRecurringMutation } from '@/queries/recurring'
 import { PostSchema } from '@/schema-validations/post'
 import moment from 'moment'
+import { useTranslations } from 'next-intl'
 
 import { Credential } from '@/types/credentials'
 import { ImagePreview } from '@/types/media'
-import { CreatePostRequest, CreateRecurringRequest } from '@/types/post'
 import { handleErrorApi } from '@/lib/utils'
 import { usePostForm } from '@/hooks/use-post-form'
 import { toast } from '@/hooks/use-toast'
@@ -35,6 +36,7 @@ export interface CreatePostModalProps {
 }
 
 export default function CreatePostModal({ open, setOpen, credentials, time }: CreatePostModalProps) {
+  const t = useTranslations('createPostModal')
   const { post } = useAppContext()
   const [showImageSlider, setShowImageSlider] = useState(false)
   const form = usePostForm(post, time)
@@ -47,6 +49,17 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
   const createPostMutation = useCreatePostMutation()
   const createRecurringMutation = useCreateRecurring()
   const uploadImagesMutation = useUploadImagesMutation()
+  const updatePostMutation = useUpdatePostMutation(post?.id || '')
+  const updateRecurringMutation = useUpdateRecurringMutation(post?.recurringPostId || '')
+  const updateRecurringInstanceMutation = useUpdateRecurringInstanceMutation(post?.recurringPostId || '')
+
+  const isLoading =
+    createPostMutation.isPending ||
+    uploadImagesMutation.isPending ||
+    createRecurringMutation.isPending ||
+    updatePostMutation.isPending ||
+    updateRecurringMutation.isPending ||
+    updateRecurringInstanceMutation.isPending
 
   // Effect handlers
   useEffect(() => {
@@ -63,6 +76,10 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
       )
       form.setValue('type', post?.metadata.type || PostType.POST)
       form.setValue('selectedPages', [post.socialCredentialID])
+      // Set default updateType to 'single' for recurring posts
+      if (post.recurringPostId) {
+        form.setValue('updateType', 'single')
+      }
     }
   }, [post])
 
@@ -90,6 +107,35 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
     return () => subscription.unsubscribe()
   }, [form])
 
+  // Watch for updateType changes to handle recurring config
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'updateType' && post?.recurringPost) {
+        if (value.updateType === 'all') {
+          // When switching to "Update All Recurring", populate the recurring config
+          form.setValue('isRecurring', true)
+          form.setValue('recurringType', post.recurringPost.frequency)
+          form.setValue('recurringDateRange', {
+            from: post.recurringPost.startDate ? new Date(post.recurringPost.startDate) : undefined,
+            to: post.recurringPost.endDate ? new Date(post.recurringPost.endDate) : undefined
+          })
+          const dayNumberToName = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+          form.setValue(
+            'recurringDays',
+            (post.recurringPost.daysOfWeek || []).map((num: number) => dayNumberToName[num])
+          )
+        } else if (value.updateType === 'single') {
+          // When switching back to "Update Single Post", unset recurring config
+          form.setValue('isRecurring', false)
+          form.setValue('recurringType', 'daily')
+          form.setValue('recurringDateRange', undefined)
+          form.setValue('recurringDays', [])
+        }
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form, post])
+
   const handleScheduleAll = (checked: boolean) => {
     form.setValue('scheduleAll', checked)
     if (checked) {
@@ -116,11 +162,29 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
   }
 
   const onSubmit = async (data: PostSchema) => {
-    if (createPostMutation.isPending || uploadImagesMutation.isPending || createRecurringMutation.isPending) return
+    if (isLoading) return
     if (form.getValues('selectedPages')?.length === 0) {
       toast({
         title: 'Error',
-        description: 'Please select at least one page',
+        description: t('selectAtLeastOnePage'),
+        variant: 'destructive'
+      })
+      return
+    }
+
+    const selectedPlatforms = credentials
+      .filter((credential) => data?.selectedPages?.includes(credential.id))
+      .map((credential) => credential.platform)
+
+    const overLimit = selectedPlatforms.some((platform) => {
+      const limit = CHARACTER_LIMITS[platform]
+      return limit && data.description && data.description.length > limit
+    })
+
+    if (overLimit) {
+      toast({
+        title: 'Error',
+        description: t('overLimit'),
         variant: 'destructive'
       })
       return
@@ -132,7 +196,7 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
     if (hasInstagram && (!data.images || data.images.length === 0)) {
       toast({
         title: 'Error',
-        description: 'Instagram posts require at least one image',
+        description: t('instagramNote'),
         variant: 'destructive'
       })
       return
@@ -140,17 +204,19 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
 
     if (moment(data.scheduledTime, 'HH:mm').isBefore(moment()) && moment(data.scheduledDate).isSame(moment(), 'day')) {
       form.setError('scheduledTime', {
-        message: 'You cannot schedule posts in the past'
+        message: t('pastSchedule')
       })
       return
     }
 
     try {
-      const scheduledDate = moment(data.scheduledDate).format('YYYY-MM-DD')
-      const files = data.images?.map((image) => image.file) || []
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let uploadImagesResponse: any
-      if (files.length > 0) {
+      // Handle images
+      let uploadImagesResponse: any = null
+      const newImages = data.images?.filter((img) => img.preview.startsWith('blob:')) || []
+      const existingImages = data.images?.filter((img) => !img.preview.startsWith('blob:')) || []
+
+      if (newImages.length > 0) {
+        const files = newImages.map((image) => image.file)
         uploadImagesResponse = await uploadImagesMutation.mutateAsync(files as File[])
       }
 
@@ -162,98 +228,25 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
           metadata: {
             type: credential.platform === 'facebook' ? data.type : 'post',
             content: data.description,
-            assets:
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              uploadImagesResponse?.data?.data?.map((image: any) => ({
+            assets: [
+              ...existingImages.map((img) => ({
+                type: 'image',
+                url: img.preview
+              })),
+              ...(uploadImagesResponse?.data?.data?.map((image: any) => ({
                 type: image.type,
                 url: image.url
-              })) || []
+              })) || [])
+            ]
           }
         }))
 
-      // If there is recurring, call the recurring API, otherwise call the post API
-      if (data.isRecurring) {
-        // Check if date range is chosen
-        if (!data.recurringDateRange?.from || !data.recurringDateRange?.to) {
-          toast({
-            title: 'Error',
-            description: 'Please select a date range for the recurring schedule',
-            variant: 'destructive'
-          })
-          return
-        }
-
-        // Check if weekly is selected and at least one day is chosen
-        if (data.recurringType === 'weekly' && data.recurringDays.length === 0) {
-          toast({
-            title: 'Error',
-            description: 'Please select at least one day in the week',
-            variant: 'destructive'
-          })
-          return
-        }
-
-        // Convert day name to number (0-6, 0 is Sunday)
-        const dayMapping: Record<string, number> = {
-          sunday: 0,
-          monday: 1,
-          tuesday: 2,
-          wednesday: 3,
-          thursday: 4,
-          friday: 5,
-          saturday: 6
-        }
-
-        const daysOfWeek =
-          data.recurringType === 'weekly'
-            ? data.recurringDays.map((day) => dayMapping[day]).sort((a, b) => a - b)
-            : undefined
-
-        const body: CreateRecurringRequest = {
-          socialPosts,
-          publicationTime: moment()
-            .set({
-              hour: parseInt(data.scheduledTime.split(':')[0]),
-              minute: parseInt(data.scheduledTime.split(':')[1])
-            })
-            .utc()
-            .format('HH:mm'),
-          recurring: {
-            frequency: data.recurringType as 'daily' | 'weekly',
-            daysOfWeek,
-            startDate: moment(data.recurringDateRange.from)
-              .set({
-                hour: parseInt(data.scheduledTime.split(':')[0]),
-                minute: parseInt(data.scheduledTime.split(':')[1])
-              })
-              .utc()
-              .format('YYYY-MM-DDTHH:mm:ss[Z]'),
-            endDate: moment(data.recurringDateRange.to)
-              .set({
-                hour: parseInt(data.scheduledTime.split(':')[0]),
-                minute: parseInt(data.scheduledTime.split(':')[1])
-              })
-              .utc()
-              .format('YYYY-MM-DDTHH:mm:ss[Z]')
-          }
-        }
-
-        await createRecurringMutation.mutateAsync(body)
-        toast({
-          title: 'Success',
-          description: 'Recurring schedule has been created successfully'
-        })
+      if (data.isRecurring && !post) {
+        await handleCreateRecurringPost(data, socialPosts)
+      } else if (post) {
+        await handleUpdatePost(data, socialPosts)
       } else {
-        const body: CreatePostRequest = {
-          publicationTime: moment(`${scheduledDate} ${data.scheduledTime}`).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
-          socialPosts
-        }
-
-        await createPostMutation.mutateAsync(body)
-        toast({
-          title: 'Success',
-          description: 'Post has been scheduled successfully'
-        })
+        await handleCreatePost(data, socialPosts)
       }
 
       setOpen(false)
@@ -267,6 +260,194 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
       handleErrorApi({
         error,
         setError: form.setError
+      })
+    }
+  }
+
+  const handleCreatePost = async (data: PostSchema, socialPosts: any[]) => {
+    const scheduledDate = moment(data.scheduledDate).format('YYYY-MM-DD')
+    const body = {
+      publicationTime: moment(`${scheduledDate} ${data.scheduledTime}`).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      socialPosts
+    }
+    await createPostMutation.mutateAsync(body)
+    toast({
+      title: 'Success',
+      description: t('postScheduled')
+    })
+  }
+
+  const handleCreateRecurringPost = async (data: PostSchema, socialPosts: any[]) => {
+    // Check if date range is chosen
+    if (!data.recurringDateRange?.from || !data.recurringDateRange?.to) {
+      toast({
+        title: 'Error',
+        description: t('selectDateRange'),
+        variant: 'destructive'
+      })
+      return
+    }
+
+    if (
+      data.recurringDateRange?.from &&
+      moment(data.recurringDateRange?.from).isSame(moment(), 'day') &&
+      moment(data.scheduledTime, 'HH:mm').isBefore(moment())
+    ) {
+      toast({
+        title: 'Error',
+        description: t('pastSchedule'),
+        variant: 'destructive'
+      })
+      return
+    }
+
+    // Check if weekly is selected and at least one day is chosen
+    if (data.recurringType === 'weekly' && data.recurringDays.length === 0) {
+      toast({
+        title: 'Error',
+        description: t('selectAtLeastOneDay'),
+        variant: 'destructive'
+      })
+      return
+    }
+
+    // Convert day name to number (0-6, 0 is Sunday)
+    const dayMapping: Record<string, number> = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6
+    }
+
+    const daysOfWeek =
+      data.recurringType === 'weekly'
+        ? data.recurringDays.map((day) => dayMapping[day]).sort((a, b) => a - b)
+        : undefined
+
+    const body = {
+      socialPosts,
+      publicationTime: moment()
+        .set({
+          hour: parseInt(data.scheduledTime.split(':')[0]),
+          minute: parseInt(data.scheduledTime.split(':')[1])
+        })
+        .utc()
+        .format('HH:mm'),
+      recurring: {
+        frequency: data.recurringType as 'daily' | 'weekly',
+        daysOfWeek,
+        startDate: moment(data.recurringDateRange.from)
+          .set({
+            hour: parseInt(data.scheduledTime.split(':')[0]),
+            minute: parseInt(data.scheduledTime.split(':')[1])
+          })
+          .utc()
+          .format('YYYY-MM-DDTHH:mm:ss[Z]'),
+        endDate: moment(data.recurringDateRange.to)
+          .set({
+            hour: parseInt(data.scheduledTime.split(':')[0]),
+            minute: parseInt(data.scheduledTime.split(':')[1])
+          })
+          .utc()
+          .format('YYYY-MM-DDTHH:mm:ss[Z]')
+      }
+    }
+    await createRecurringMutation.mutateAsync(body)
+    toast({
+      title: 'Success',
+      description: t('recurringScheduleCreated')
+    })
+  }
+
+  const handleUpdatePost = async (data: PostSchema, socialPosts: any[]) => {
+    if (post?.status === 'published') return
+
+    const scheduledDate = moment(data.scheduledDate).format('YYYY-MM-DD')
+    const body: any = {
+      publicationTime: moment(`${scheduledDate} ${data.scheduledTime}`).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      metadata: {
+        ...socialPosts[0].metadata
+      }
+    }
+
+    // Case 1: Update normal post
+    if (!post?.recurringPostId) {
+      await updatePostMutation.mutateAsync(body)
+      toast({
+        title: 'Success',
+        description: t('postUpdated')
+      })
+      return
+    }
+
+    // Case 2 & 3: Update recurring post
+    if (data.updateType === 'all') {
+      // Convert day name to number (0-6, 0 is Sunday)
+      const dayMapping: Record<string, number> = {
+        sunday: 0,
+        monday: 1,
+        tuesday: 2,
+        wednesday: 3,
+        thursday: 4,
+        friday: 5,
+        saturday: 6
+      }
+
+      const daysOfWeek =
+        data.recurringType === 'weekly'
+          ? data.recurringDays.map((day) => dayMapping[day]).sort((a, b) => a - b)
+          : undefined
+
+      const bodyRecurring = {
+        publicationTime: moment()
+          .set({
+            hour: parseInt(data.scheduledTime.split(':')[0]),
+            minute: parseInt(data.scheduledTime.split(':')[1])
+          })
+          .utc()
+          .format('HH:mm'),
+        recurring: {
+          frequency: data.recurringType as 'daily' | 'weekly',
+          daysOfWeek,
+          startDate: moment(data.recurringDateRange?.from)
+            .set({
+              hour: parseInt(data.scheduledTime.split(':')[0]),
+              minute: parseInt(data.scheduledTime.split(':')[1])
+            })
+            .utc()
+            .format('YYYY-MM-DDTHH:mm:ss[Z]'),
+          endDate: moment(data.recurringDateRange?.to)
+            .set({
+              hour: parseInt(data.scheduledTime.split(':')[0]),
+              minute: parseInt(data.scheduledTime.split(':')[1])
+            })
+            .utc()
+            .format('YYYY-MM-DDTHH:mm:ss[Z]')
+        }
+      }
+      // Case 3: Update all recurring posts
+      await updateRecurringMutation.mutateAsync({
+        ...body,
+        ...bodyRecurring
+      })
+      toast({
+        title: 'Success',
+        description: t('allRecurringPostsUpdated')
+      })
+    } else {
+      // Case 2: Update single post in recurring series
+      if (post.id && !post.id.startsWith('recurring')) {
+        body.postId = post.id
+      }
+      await updateRecurringInstanceMutation.mutateAsync({
+        ...body
+      })
+      toast({
+        title: 'Success',
+        description: t('postUpdated')
       })
     }
   }
@@ -287,24 +468,36 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
         setOpen(open)
       }}
     >
-      <DialogContent className='max-w-[95vw] xl:max-w-screen-xl p-0 gap-0'>
+      <DialogContent className='max-w-[95vw] xl:max-w-screen-xl p-0 gap-0 max-h-[90vh] overflow-y-auto scrollbar-none lg:overflow-y-hidden lg:max-h-full'>
         <DialogHeader className='p-6 pb-0'>
-          <DialogTitle>Schedule Post</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col lg:flex-row'>
+          <form
+            onSubmit={form.handleSubmit(onSubmit, (errors) => {
+              console.log(errors)
+            })}
+            className='flex flex-col lg:flex-row'
+          >
             <CredentialsPanel form={form} credentials={credentials} onScheduleAll={handleScheduleAll} />
-            <FormPanel form={form} onImageUpload={handleImageUpload} />
+            <FormPanel
+              form={form}
+              onImageUpload={handleImageUpload}
+              isEdit={!!post}
+              isRecurringPost={!!post?.recurringPostId}
+              updateType={form.watch('updateType')}
+            />
             <PreviewPanel
               preview={preview}
               credentials={credentials}
               post={post}
-              isSubmitting={
-                createPostMutation.isPending || uploadImagesMutation.isPending || createRecurringMutation.isPending
-              }
+              isSubmitting={isLoading}
               onRemoveImage={removeImage}
               onClose={() => setOpen(false)}
               onShowSlider={() => setShowImageSlider(true)}
+              isEdit={!!post}
+              isRecurringPost={!!post?.recurringPostId}
+              form={form}
             />
           </form>
         </Form>

@@ -10,8 +10,9 @@ import HashTags from './hashtags-dialog'
 
 interface Props<T extends FieldValues> {
   field: ControllerRenderProps<T>
+  disabled?: boolean
 }
-export default function AppInput<T extends FieldValues>({ field }: Props<T>) {
+export default function AppInput<T extends FieldValues>({ field, disabled }: Props<T>) {
   const [text, setText] = useState<string>(field.value || '')
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -54,6 +55,7 @@ export default function AppInput<T extends FieldValues>({ field }: Props<T>) {
         ref={textareaRef}
         value={text}
         minLength={7}
+        disabled={disabled}
         onFocus={() => {
           divRef.current?.classList.add('border-ring')
         }}
@@ -67,7 +69,9 @@ export default function AppInput<T extends FieldValues>({ field }: Props<T>) {
         onChange={(e) => onContentChange(e.target.value)}
       />
 
-      <div className='p-4 flex gap-4 border border-y-input rounded-b-md'>
+      <div
+        className={`p-4 flex gap-4 border border-y-input rounded-b-md ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
+      >
         <AIDialog onContentChange={onContentChange} text={text} />
         <EmojiDialog insertEmoji={insertEmoji} />
         <HashTags onAddHashtags={onAddHashTags} />

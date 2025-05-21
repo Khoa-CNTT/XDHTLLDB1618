@@ -2,7 +2,7 @@ import { get } from 'http'
 import { PLATFORM_TYPE } from '@/constants'
 import http from '@/utils/http'
 
-import { CreatePostRequest, Post } from '@/types/post'
+import { CreatePostRequest, Post, UpdatePostRequest } from '@/types/post'
 import { SuccessResponse } from '@/types/utils'
 
 export type GetPostsParams = {
@@ -34,6 +34,12 @@ const postApi = {
         Authorization: `Bearer ${accessToken}`
       }
     })
+  },
+  updatePost(id: string, data: UpdatePostRequest) {
+    return http.patch(`${POST_URI}/${id}`, data)
+  },
+  deletePost(id: string) {
+    return http.delete(`${POST_URI}/${id}`)
   }
 }
 

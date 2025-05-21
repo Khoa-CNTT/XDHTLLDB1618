@@ -1,12 +1,15 @@
 import { PostType } from '@/constants/post'
-import { postSchema, PostSchema } from '@/schema-validations/post'
+import { createPostSchema, PostSchema } from '@/schema-validations/post'
 import { zodResolver } from '@hookform/resolvers/zod'
 import moment from 'moment'
+import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 
 import { Post } from '@/types/post'
 
 export const usePostForm = (post: Post | undefined, time: { start: Date; end: Date }) => {
+  const t = useTranslations('createPostModal')
+  const postSchema = createPostSchema(t)
   const form = useForm<PostSchema>({
     defaultValues: {
       type: post?.metadata.type || PostType.POST,
@@ -25,7 +28,8 @@ export const usePostForm = (post: Post | undefined, time: { start: Date; end: Da
       isRecurring: false,
       recurringType: 'daily',
       recurringDays: [],
-      recurringDateRange: undefined
+      recurringDateRange: undefined,
+      updateType: 'single'
     },
     resolver: zodResolver(postSchema)
   })

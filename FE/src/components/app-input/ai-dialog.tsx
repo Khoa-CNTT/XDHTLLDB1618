@@ -5,17 +5,20 @@ import {
   ArrowDownWideNarrow,
   ArrowLeft,
   ArrowUpWideNarrow,
+  Info,
   RefreshCcw,
   Settings,
   Sparkles,
   SpellCheck
 } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import { flushSync } from 'react-dom'
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 import { Button } from '../ui/button'
 import { Textarea } from '../ui/textarea'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import AiSetting from './ai-setting'
 
 // Types
@@ -40,6 +43,7 @@ type Action =
 
 // Custom Hook
 const useAIDialog = (onContentChange: (text: string) => void, text?: string) => {
+  const locale = useLocale()
   const initialState: State = {
     open: false,
     step: 1,
@@ -74,6 +78,7 @@ const useAIDialog = (onContentChange: (text: string) => void, text?: string) => 
     Specific Hashtags: #Lunaria, #Candle
     User Description: ${settings.userDescription}
     Post Topic: ${settings.responseFormat}
+    Language: ${locale}
   `
 
   const generatePromptWithSettings = (action: string, content: string) => `
@@ -83,6 +88,7 @@ const useAIDialog = (onContentChange: (text: string) => void, text?: string) => 
     Use Emojis: ${state.settings.isUseEmoji ? 'Yes' : 'No'}
     Use Hashtags: ${state.settings.isUseHashtags ? 'Yes' : 'No'}
     Specific Hashtags: #Lunaria, #Candle
+    Language: ${locale}
   `
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -201,40 +207,42 @@ const ActionButtons = ({
   onFixGrammar: () => void
   isGenerating: boolean
   hasGeneratedContent: boolean
-}) => (
-  <div className='space-y-3'>
-    {hasGeneratedContent && (
-      <div className='flex items-center gap-2'>
-        <Button className='rounded-3xl' variant='outline' onClick={onRewrite} disabled={isGenerating}>
-          <RefreshCcw />
-          Rewrite
-        </Button>
-        <Button className='rounded-3xl' variant='outline' onClick={onMakeLonger} disabled={isGenerating}>
-          <ArrowUpWideNarrow />
-          Longer
-        </Button>
-        <Button className='rounded-3xl' variant='outline' onClick={onMakeShorter} disabled={isGenerating}>
-          <ArrowDownWideNarrow />
-          Shorter
-        </Button>
-        <Button className='rounded-3xl' variant='outline' onClick={onFixGrammar} disabled={isGenerating}>
-          <SpellCheck />
-          Fix grammar
-        </Button>
-      </div>
-    )}
-    <Button disabled={isGenerating} className='w-full' onClick={onGenerate}>
-      <Sparkles />
-      {isGenerating ? 'Generating...' : 'Generate'}
-    </Button>
-  </div>
-)
+}) => {
+  const t = useTranslations('createPostModal')
+  return (
+    <div className='space-y-3'>
+      {hasGeneratedContent && (
+        <div className='flex items-center gap-2'>
+          <Button className='rounded-3xl' variant='outline' onClick={onRewrite} disabled={isGenerating}>
+            <RefreshCcw />
+            {t('rewrite')}
+          </Button>
+          <Button className='rounded-3xl' variant='outline' onClick={onMakeLonger} disabled={isGenerating}>
+            <ArrowUpWideNarrow />
+            {t('longer')}
+          </Button>
+          <Button className='rounded-3xl' variant='outline' onClick={onMakeShorter} disabled={isGenerating}>
+            <ArrowDownWideNarrow />
+            {t('shorter')}
+          </Button>
+          <Button className='rounded-3xl' variant='outline' onClick={onFixGrammar} disabled={isGenerating}>
+            <SpellCheck />
+            {t('fixGrammar')}
+          </Button>
+        </div>
+      )}
+      <Button disabled={isGenerating} className='w-full' onClick={onGenerate}>
+        <Sparkles />
+        {isGenerating ? t('generating') : t('generate')}
+      </Button>
+    </div>
+  )
+}
 
-const Disclaimer = () => (
-  <span className='text-gray-500 text-xs italic mt-6 inline-block'>
-    AI Assistant can generate inaccurate or misleading information. Always review generated content before posting.
-  </span>
-)
+const Disclaimer = () => {
+  const t = useTranslations('createPostModal')
+  return <div className='text-gray-500 text-xs italic'>{t('aiNote')}</div>
+}
 
 // Main Component
 const AIDialog = ({ onContentChange, text }: Props) => {
@@ -250,18 +258,20 @@ const AIDialog = ({ onContentChange, text }: Props) => {
     isGenerating
   } = useAIDialog(onContentChange, text)
 
+  const t = useTranslations('createPostModal')
+
   return (
     <Popover open={state.open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Sparkles className='text-yellow-400 size-5' />
       </PopoverTrigger>
-      <PopoverContent className='w-[600px]' align='start' side={state.step === 1 ? 'bottom' : 'right'}>
+      <PopoverContent className='w-full lg:w-[600px] w-parent-full' align='start'>
         <div className='flex justify-between items-center w-full mb-4'>
           <ArrowLeft
             onClick={() => dispatch({ type: 'SET_STEP', payload: 1 })}
             className={`size-4 cursor-pointer ${state.step === 1 && 'opacity-0'}`}
           />
-          <span className='text-center'>AI Generator</span>
+          <span className='text-center'>{t('aiGenerate')}</span>
           <Settings
             onClick={() => dispatch({ type: 'SET_STEP', payload: 2 })}
             className={`size-4 cursor-pointer ${state.step === 2 && 'opacity-0'}`}
@@ -271,10 +281,22 @@ const AIDialog = ({ onContentChange, text }: Props) => {
         <div className='py-2'>
           {state.step === 1 ? (
             <div className='space-y-3'>
-              <p className='font-semibold'>Describe the post you are submitting to generate ideas</p>
+              <div className='flex items-center justify-between gap-2'>
+                <p className='font-semibold'>{t('aiDescription')}</p>
+                <div className='lg:hidden'>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Info className='inline size-4 text-muted-foreground' />
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <Disclaimer />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
               <Textarea
                 onChange={(e) => dispatch({ type: 'UPDATE_SETTINGS', payload: { userDescription: e.target.value } })}
-                placeholder='e.g. Promote my blog post about the best trekking tour'
+                placeholder={t('example')}
                 value={state.settings.userDescription || ''}
               />
               <ActionButtons
@@ -286,7 +308,9 @@ const AIDialog = ({ onContentChange, text }: Props) => {
                 isGenerating={isGenerating}
                 hasGeneratedContent={!!state.generatedContent}
               />
-              <Disclaimer />
+              <div className='hidden lg:block'>
+                <Disclaimer />
+              </div>
             </div>
           ) : (
             <AiSetting

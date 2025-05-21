@@ -23,6 +23,8 @@ export type Post = {
     }[]
     [key: string]: any
   }
+  recurringPostId?: string
+  recurringPost?: any
 }
 
 export type CreatePostRequest = {
@@ -39,6 +41,18 @@ export type CreatePostRequest = {
       }[]
     }
   }[]
+}
+
+export type UpdatePostRequest = {
+  publicationTime: string
+  metadata: {
+    type: string
+    content: string
+    assets: {
+      type: string
+      url: string
+    }[]
+  }
 }
 
 export type RecurringPost = {
@@ -80,4 +94,31 @@ export type CreateRecurringRequest = {
     startDate: string
     endDate: string
   }
+}
+
+export type UpdateRecurringRequest = {
+  publicationTime: string
+  metadata: {
+    type: string
+    content: string
+    assets: { type: string; url: string }[]
+  }
+  recurring: {
+    frequency: 'daily' | 'weekly'
+    daysOfWeek?: number[]
+    startDate: string
+    endDate: string
+  }
+}
+
+export type RecurringPostInstance = {
+  id: string
+  publicationTime: string
+  metadata: {
+    type: string
+    content: string
+    assets: { type: string; url: string }[]
+  }
+  status: string
+  recurringPostId: string
 }

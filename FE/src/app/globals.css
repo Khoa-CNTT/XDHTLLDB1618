@@ -114,3 +114,7 @@
   flex: 0 0 100%;
   min-width: 0;
 }
+
+div[data-radix-popper-content-wrapper]:has(> .w-parent-full) {
+  @apply w-full p-4 lg:w-[600px];
+}

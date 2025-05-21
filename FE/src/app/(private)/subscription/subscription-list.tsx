@@ -1,5 +1,6 @@
 import { FADE_IN_STAGGER_ANIMATION, fadeInChildVariants } from '@/constants/effects'
 import { CheckCircle2, Sparkles } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -8,35 +9,36 @@ import ElementEffectStagger from '@/components/effects/element-effect-stagger'
 
 const plans = [
   {
-    title: 'Basic',
+    title: 'basic',
     monthlyPrice: 0,
     yearlyPrice: 0,
-    description: 'Essential features you need to get started',
+    description: 'basicDescription',
     features: ['Example Feature Number 1', 'Example Feature Number 2', 'Example Feature Number 3'],
-    actionLabel: 'Get Started',
+    actionLabel: 'getStarted',
     isFree: true,
     popular: false
   },
   {
-    title: 'Pro',
+    title: 'pro',
     monthlyPrice: 25,
     yearlyPrice: 250,
-    description: 'Perfect for owners of small & medium businessess',
+    description: 'proDescription',
     features: ['Example Feature Number 1', 'Example Feature Number 2', 'Example Feature Number 3'],
-    actionLabel: 'Get Started',
+    actionLabel: 'getStarted',
     popular: true
   },
   {
-    title: 'Enterprise',
-    price: 'Custom',
-    description: 'Dedicated support and infrastructure to fit your needs',
+    title: 'enterprise',
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    description: 'enterpriseDescription',
     features: [
       'Example Feature Number 1',
       'Example Feature Number 2',
       'Example Feature Number 3',
       'Super Exclusive Feature'
     ],
-    actionLabel: 'Contact Sales',
+    actionLabel: 'contactSales',
     exclusive: true
   }
 ]
@@ -73,76 +75,80 @@ const PricingCard = ({
   popular,
   isFree,
   exclusive
-}: PricingCardProps) => (
-  <Card
-    className={cn(
-      `w-72 flex h-full relative flex-col justify-between py-1 ${popular ? 'border-rose-400' : 'border-zinc-700'} mx-auto sm:mx-0`,
-      {
-        'animate-background-shine bg-white dark:bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] transition-colors':
-          exclusive
-      }
-    )}
-  >
-    <div>
-      {popular && (
-        <div
-          className={cn({
-            'absolute top-0 flex items-center left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-3xl text-xs bg-red-500 text-white px-4 py-2':
-              popular
-          })}
-        >
-          <Sparkles className='mr-2' size={18} />
-          Recommended
-        </div>
+}: PricingCardProps) => {
+  const t = useTranslations('subscription')
+  return (
+    <Card
+      className={cn(
+        `w-72 flex h-full relative flex-col justify-between py-1 ${popular ? 'border-rose-400' : 'border-zinc-700'} mx-auto sm:mx-0`,
+        {
+          'animate-background-shine bg-white dark:bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] transition-colors':
+            exclusive
+        }
       )}
-      <CardHeader className='py-8'>
-        {isYearly && yearlyPrice && monthlyPrice ? (
-          <div className='flex justify-between'>
-            <CardTitle className='text-zinc-700 dark:text-zinc-300 text-lg'>{title}</CardTitle>
-            <div
-              className={cn(
-                'px-2.5 rounded-xl h-fit text-sm py-1 bg-zinc-200 text-black dark:bg-zinc-800 dark:text-white',
-                {
-                  'bg-gradient-to-r from-orange-400 to-rose-400 dark:text-black ': popular
-                }
-              )}
-            >
-              Save ${monthlyPrice * 12 - yearlyPrice}
-            </div>
+    >
+      <div>
+        {popular && (
+          <div
+            className={cn({
+              'absolute top-0 flex items-center left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-3xl text-xs bg-red-500 text-white px-4 py-2':
+                popular
+            })}
+          >
+            <Sparkles className='mr-2' size={18} />
+            {t('recommended')}
           </div>
-        ) : (
-          <CardTitle className='text-zinc-700 dark:text-zinc-300 text-lg'>{title}</CardTitle>
         )}
-        <div className='flex gap-0.5'>
-          {isFree ? (
-            <h3 className='text-3xl font-bold'>Free</h3>
+        <CardHeader className='py-8'>
+          {isYearly && yearlyPrice && monthlyPrice ? (
+            <div className='flex justify-between'>
+              <CardTitle className='text-zinc-700 dark:text-zinc-300 text-lg'>{t(title)}</CardTitle>
+              <div
+                className={cn(
+                  'px-2.5 rounded-xl h-fit text-sm py-1 bg-zinc-200 text-black dark:bg-zinc-800 dark:text-white',
+                  {
+                    'bg-gradient-to-r from-orange-400 to-rose-400 dark:text-black ': popular
+                  }
+                )}
+              >
+                {t('save', { value: monthlyPrice * 12 - yearlyPrice })}
+              </div>
+            </div>
           ) : (
-            <>
-              <h3 className='text-3xl font-bold'>
-                {yearlyPrice && isYearly ? '$' + yearlyPrice : monthlyPrice ? '$' + monthlyPrice : 'Custom'}
-              </h3>
-              <span className='flex flex-col justify-end text-sm mb-1'>
-                {yearlyPrice && isYearly ? '/year' : monthlyPrice ? '/month' : null}
-              </span>
-            </>
+            <CardTitle className='text-zinc-700 dark:text-zinc-300 text-lg'>{t(title)}</CardTitle>
           )}
-        </div>
-        <CardDescription className='pt-1.5 h-12'>{description}</CardDescription>
-      </CardHeader>
-      <CardContent className='flex flex-col gap-2'>
-        {features.map((feature: string) => (
-          <CheckItem key={feature} text={feature} />
-        ))}
-      </CardContent>
-    </div>
-    <CardFooter className='mt-2'>
-      <Button className='relative inline-flex w-full items-center justify-center rounded-md bg-black text-white dark:bg-white px-6 font-medium  dark:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50'>
-        <div className='absolute -inset-0.5 -z-10 rounded-lg bg-gradient-to-b from-[#c7d2fe] to-[#8678f9] opacity-75 blur' />
-        {actionLabel}
-      </Button>
-    </CardFooter>
-  </Card>
-)
+          <div className='flex gap-0.5'>
+            {isFree ? (
+              <h3 className='text-2xl font-bold'>{t('free')}</h3>
+            ) : (
+              <>
+                <h3 className='text-2xl font-bold'>
+                  {yearlyPrice && isYearly
+                    ? t('valuePerYear', { value: yearlyPrice })
+                    : monthlyPrice
+                      ? t('valuePerMonth', { value: monthlyPrice })
+                      : t('custom')}
+                </h3>
+              </>
+            )}
+          </div>
+          <CardDescription className='pt-1.5 h-12'>{t(description)}</CardDescription>
+        </CardHeader>
+        <CardContent className='flex flex-col gap-2'>
+          {features.map((feature: string) => (
+            <CheckItem key={feature} text={feature} />
+          ))}
+        </CardContent>
+      </div>
+      <CardFooter className='mt-2'>
+        <Button className='relative inline-flex w-full items-center justify-center rounded-md bg-black text-white dark:bg-white px-6 font-medium  dark:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50'>
+          <div className='absolute -inset-0.5 -z-10 rounded-lg bg-gradient-to-b from-[#c7d2fe] to-[#8678f9] opacity-75 blur' />
+          {t(actionLabel)}
+        </Button>
+      </CardFooter>
+    </Card>
+  )
+}
 
 export default function SubscriptionList({ type }: { type: 'monthly' | 'yearly' }) {
   return (

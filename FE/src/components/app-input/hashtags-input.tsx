@@ -1,5 +1,6 @@
 import React, { KeyboardEvent, useState } from 'react'
 import { X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -77,6 +78,8 @@ const HashtagInput = ({ value, onChange }: HashtagInputProps) => {
     }
   }
 
+  const t = useTranslations('createPostModal')
+
   return (
     <div className='w-full max-w-xl space-y-2'>
       <div className='flex flex-wrap gap-2 p-2 min-h-10 rounded-md border'>
@@ -93,12 +96,10 @@ const HashtagInput = ({ value, onChange }: HashtagInputProps) => {
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
           className='grow border-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0'
-          placeholder='Type and press enter to add hashtags'
+          placeholder={t('hashtagsPlaceholder')}
         />
       </div>
-      <p className='text-sm text-muted-foreground'>
-        Press space, enter, or comma to add a hashtag. Press backspace to remove the last tag.
-      </p>
+      <p className='text-sm text-muted-foreground'>{t('hashtagsNote')}</p>
     </div>
   )
 }

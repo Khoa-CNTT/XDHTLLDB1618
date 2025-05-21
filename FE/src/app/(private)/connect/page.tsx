@@ -23,10 +23,10 @@ export default function ConnectPage() {
           </div>
 
           <Tabs defaultValue={platform || 'facebook'} className='w-full'>
-            <TabsList className='grid w-full grid-cols-5 mb-8'>
+            <TabsList className='grid w-full grid-cols-4 mb-8'>
               <TabsTrigger value={Platform.FACEBOOK}>Facebook</TabsTrigger>
               <TabsTrigger value={Platform.THREADS}>Threads</TabsTrigger>
-              <TabsTrigger value={Platform.REDDIT}>Reddit</TabsTrigger>
+              {/* <TabsTrigger value={Platform.REDDIT}>Reddit</TabsTrigger> */}
               <TabsTrigger value={Platform.X}>X</TabsTrigger>
               <TabsTrigger value={Platform.INSTAGRAM}>Instagram</TabsTrigger>
             </TabsList>
@@ -36,9 +36,9 @@ export default function ConnectPage() {
             <TabsContent value={Platform.THREADS}>
               <PlatformAccounts platformId={Platform.THREADS} />
             </TabsContent>
-            <TabsContent value={Platform.REDDIT}>
+            {/* <TabsContent value={Platform.REDDIT}>
               <PlatformAccounts platformId={Platform.REDDIT} />
-            </TabsContent>
+            </TabsContent> */}
             <TabsContent value={Platform.X}>
               <PlatformAccounts platformId={Platform.X} />
             </TabsContent>

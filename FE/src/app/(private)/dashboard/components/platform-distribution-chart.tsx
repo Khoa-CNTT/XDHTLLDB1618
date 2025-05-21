@@ -28,20 +28,25 @@ const chartConfig = {
   threads: {
     label: 'Threads',
     color: 'hsl(var(--chart-4))'
-  },
-  reddit: {
-    label: 'Reddit',
-    color: 'hsl(var(--chart-5))'
   }
+  // reddit: {
+  //   label: 'Reddit',
+  //   color: 'hsl(var(--chart-5))'
+  // }
 } satisfies ChartConfig
 
 export function PlatformDistributionChart({ data }: { data: Statistical['postsByPlatform'] }) {
   const hasZeroValues = Object.values(data).every((value) => value === 0)
-  const chartData = Object.entries(data).map(([platform, count]) => ({
-    name: platform,
-    value: count,
-    fill: chartConfig[platform as keyof typeof chartConfig].color
-  }))
+  const chartData = Object.entries(data).map(([platform, count]) => {
+    if (platform === 'reddit') {
+      return null
+    }
+    return {
+      name: platform,
+      value: count,
+      fill: chartConfig[platform as keyof typeof chartConfig].color
+    }
+  })
 
   const chartRef = useRef<HTMLDivElement>(null)
 

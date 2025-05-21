@@ -98,7 +98,8 @@ export default function FacebookSdk({ btnText }: { btnText: string }) {
           }
         },
         {
-          scope: 'public_profile,email,pages_manage_metadata,pages_messaging,pages_read_engagement,pages_manage_posts'
+          scope:
+            'email,read_insights,pages_show_list,instagram_basic,instagram_manage_insights,pages_read_engagement,pages_manage_metadata,pages_read_user_content,pages_manage_posts,pages_manage_engagement,public_profile'
         }
       )
     } else {

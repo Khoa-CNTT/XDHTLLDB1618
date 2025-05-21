@@ -26,6 +26,10 @@ const credentialApi = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   connectSocialAccount(data: any) {
     return http.post(CREDENTIAL_URI, data)
+  },
+
+  disconnectSocialAccount(id: string) {
+    return http.patch<{ message: string }>(`${CREDENTIAL_URI}/${id}/disconnect`)
   }
 }
 

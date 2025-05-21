@@ -1,4 +1,5 @@
 import { FADE_IN_ANIMATION, FADE_IN_STAGGER_ANIMATION, fadeInChildVariants } from '@/constants/effects'
+import { getTranslations } from 'next-intl/server'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -6,24 +7,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import ElementEffect from '@/components/effects/element-effect'
 import ElementEffectStagger from '@/components/effects/element-effect-stagger'
 
-export function BillingSettings() {
+export async function BillingSettings() {
+  const t = await getTranslations('settings')
   return (
     <div className='grid gap-6'>
       <ElementEffect animationProps={FADE_IN_ANIMATION}>
         <Card>
           <CardHeader>
-            <CardTitle>Current Plan</CardTitle>
-            <CardDescription>You are currently on the Enterprise plan</CardDescription>
+            <CardTitle>{t('currentPlan')}</CardTitle>
+            <CardDescription>{t('currentPlanDescription')}</CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
             <div className='flex items-center justify-between'>
               <div>
-                <h3 className='font-semibold'>Enterprise Plan</h3>
-                <p className='text-sm text-muted-foreground'>$99/month</p>
+                <h3 className='font-semibold'>{t('enterprisePlan')}</h3>
+                <p className='text-sm text-muted-foreground'>{t('enterprisePlanPrice', { value: 99 })}</p>
               </div>
-              <Badge>Current Plan</Badge>
+              <Badge>{t('currentPlan')}</Badge>
             </div>
-            <Button variant='outline'>Change Plan</Button>
+            <Button variant='outline'>{t('changePlan')}</Button>
           </CardContent>
         </Card>
       </ElementEffect>
@@ -31,8 +33,8 @@ export function BillingSettings() {
       <ElementEffect animationProps={FADE_IN_ANIMATION}>
         <Card>
           <CardHeader>
-            <CardTitle>Payment Method</CardTitle>
-            <CardDescription>Manage your payment information</CardDescription>
+            <CardTitle>{t('paymentMethod')}</CardTitle>
+            <CardDescription>{t('paymentMethodDescription')}</CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
             <div className='flex items-center justify-between'>
@@ -41,15 +43,15 @@ export function BillingSettings() {
                   <span className='text-sm font-medium'>VISA</span>
                 </div>
                 <div>
-                  <p className='font-medium'>Visa ending in 4242</p>
-                  <p className='text-sm text-muted-foreground'>Expires 12/24</p>
+                  <p className='font-medium'>{t('visaEndingIn', { last4: '4242' })}</p>
+                  <p className='text-sm text-muted-foreground'>{t('expires')}</p>
                 </div>
               </div>
               <Button variant='ghost' size='sm'>
-                Edit
+                {t('edit')}
               </Button>
             </div>
-            <Button variant='outline'>Add Payment Method</Button>
+            <Button variant='outline'>{t('addPaymentMethod')}</Button>
           </CardContent>
         </Card>
       </ElementEffect>
@@ -57,8 +59,8 @@ export function BillingSettings() {
       <ElementEffect animationProps={FADE_IN_ANIMATION}>
         <Card>
           <CardHeader>
-            <CardTitle>Billing History</CardTitle>
-            <CardDescription>View your billing history and download invoices</CardDescription>
+            <CardTitle>{t('billingHistory')}</CardTitle>
+            <CardDescription>{t('billingHistoryDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ElementEffectStagger
@@ -67,9 +69,9 @@ export function BillingSettings() {
               className='space-y-4'
             >
               {[
-                { date: 'Dec 1, 2023', amount: '$99.00', status: 'Paid' },
-                { date: 'Nov 1, 2023', amount: '$99.00', status: 'Paid' },
-                { date: 'Oct 1, 2023', amount: '$99.00', status: 'Paid' }
+                { date: 'Dec 1, 2023', amount: t('currency', { value: 99 }), status: t('paid') },
+                { date: 'Nov 1, 2023', amount: t('currency', { value: 99 }), status: t('paid') },
+                { date: 'Oct 1, 2023', amount: t('currency', { value: 99 }), status: t('paid') }
               ].map((invoice, index) => (
                 <div key={index} className='flex items-center justify-between'>
                   <div>
@@ -79,7 +81,7 @@ export function BillingSettings() {
                   <div className='flex items-center space-x-2'>
                     <Badge variant='outline'>{invoice.status}</Badge>
                     <Button variant='ghost' size='sm'>
-                      Download
+                      {t('download')}
                     </Button>
                   </div>
                 </div>

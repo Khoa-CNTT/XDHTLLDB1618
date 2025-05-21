@@ -1,13 +1,16 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { DEFAULT_NUMBER_OF_SKELETON } from '@/constants'
 import { Platform, PlatformType } from '@/constants/credentials'
-import { useCredentialQuery } from '@/queries/credentials'
-import { ExternalLink, Unlink } from 'lucide-react'
+import { useCredentialQuery, useDisconnectSocialAccountMutation } from '@/queries/credentials'
+import { ExternalLink, Loader2, Unlink } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
+import { handleErrorApi } from '@/lib/utils'
+import { toast } from '@/hooks/use-toast'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -40,9 +43,12 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
   const isNotAllowFetching = Boolean(
     searchParams.get('code') || searchParams.get('oauth_token') || searchParams.get('oauth_verifier')
   )
+
   const { data: credentials, isLoading } = useCredentialQuery(platformId, isNotAllowFetching)
   const t = useTranslations('connect')
   const btnTextConnect = t('connectAccount')
+
+  const [disconnectingAccountId, setDisconnectingAccountId] = useState<string | null>(null)
 
   const getPlatformButton = () => {
     switch (platformId) {
@@ -59,9 +65,24 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
     }
   }
 
-  const handleDisconnect = (accountId: string) => {
-    //TODO: handle it
-    console.log(accountId)
+  const { mutateAsync: disconnectSocialAccount } = useDisconnectSocialAccountMutation(platformId)
+
+  const handleDisconnect = async (accountId: string) => {
+    if (disconnectingAccountId) return
+    try {
+      setDisconnectingAccountId(accountId)
+      const res = await disconnectSocialAccount(accountId)
+      toast({
+        title: t('success'),
+        description: t('disconnectSuccess')
+      })
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    } finally {
+      setDisconnectingAccountId(null)
+    }
   }
 
   return (
@@ -102,7 +123,12 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
                     <Link href={account.metadata.name || '#'}>
                       <ExternalLink />
                     </Link>
-                    <Button variant='destructive' onClick={() => handleDisconnect(account.id)}>
+                    <Button
+                      variant='destructive'
+                      onClick={() => handleDisconnect(account.id)}
+                      disabled={disconnectingAccountId === account.id}
+                    >
+                      {disconnectingAccountId === account.id && <Loader2 className='size-4 animate-spin mr-2' />}
                       <Unlink />
                     </Button>
                   </div>

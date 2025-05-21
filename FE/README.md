@@ -1,8 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Post-pilot (Front-end): Social Media Scheduling System 🎉🎉🎉
 
-## Getting Started
+## 📝 Overview
 
-First, run the development server:
+Post-pilot is a powerful social media management platform that enables users to schedule and automate their social media posts across multiple platforms. Powered by AI technology, it not only helps schedule content but also assists in content creation, making social media management effortless for individuals and businesses.
+
+## ✨ Features
+
+- Connect and manage multiple social media accounts
+- Support for multiple platforms:
+  - Facebook
+  - Instagram
+  - Threads
+  - X (Twitter)
+- Real-time account status monitoring
+- Easy account disconnection
+- Modern and responsive UI
+- AI-powered content creation and scheduling
+- Multi-language support
+
+## 🛠️ Tech Stack
+
+- [Next.js](https://nextjs.org) - React framework
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [Tailwind CSS](https://tailwindcss.com) - Styling
+- [Shadcn UI](https://ui.shadcn.com) - UI components
+- [TanStack Query](https://tanstack.com/query/latest) - Data fetching
+- [Next-intl](https://next-intl-docs.vercel.app) - Internationalization
+- [Gemini](https://ai.google.dev/gemini) - AI model
+
+## 🚀 Getting Started
+
+### 📋 Prerequisites
+
+- Node.js 18.x or later
+- npm, yarn, or pnpm
+
+### 💻 Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/TynPham/postpilot-front_end
+cd front-end-next
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Set up environment variables:
+   Create a `.env` file following the `env.example` file in the root directory and add necessary environment variables
+
+4. Run the development server:
 
 ```bash
 npm run dev
@@ -10,27 +65,38 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [https://localhost:3001](https://localhost:3001) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 👨‍💻 Development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 📁 Project Structure
 
-## Learn More
+```
+src/
+├── app/                   # Next.js app router pages
+│   ├── (private)/         # Private routes (authenticated)
+│   ├── (auth)/            # Auth routes
+│   └── api/               # API routes
+├── components/            # Reusable components
+│   └── ui/                # UI components (shadcn)
+├── hooks/                 # Custom React hooks
+├── lib/                   # Utility functions
+├── queries/               # TanStack Query hooks
+├── styles/                # Global styles
+└── types/                 # TypeScript type definitions
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 📂 Key Directories
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `src/app`: Contains all the pages and API routes
+- `src/components`: Reusable React components
+- `src/hooks`: Custom React hooks for shared logic
+- `src/lib`: Utility functions and helpers
+- `src/queries`: Data fetching logic using TanStack Query
+- `src/types`: TypeScript type definitions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📄 License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License

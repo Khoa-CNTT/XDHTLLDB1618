@@ -1,12 +1,16 @@
 'use client'
 
-import { SetStateAction, useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 import { useAppContext } from '@/contexts/app-context'
 import { useGetPosts } from '@/queries/post'
 import { getCustomEventStyle } from '@/utils/calendar'
 import { useQueryClient } from '@tanstack/react-query'
 import { AxiosResponse } from 'axios'
 import moment from 'moment'
+
+import 'moment/locale/vi'
+
+import { useLocale, useTranslations } from 'next-intl'
 import { momentLocalizer, SlotInfo, Views } from 'react-big-calendar'
 
 import { Credential } from '@/types/credentials'
@@ -37,6 +41,15 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
 
   const { data: posts } = useGetPosts()
   const queryClient = useQueryClient()
+  const locale = useLocale()
+  const t = useTranslations('schedules')
+  const { openCreateScheduleModal, setOpenCreateScheduleModal, setPost } = useAppContext()
+
+  useEffect(() => {
+    // Map next-intl locale to moment locale
+    const momentLocale = locale === 'vi' ? 'vi' : 'en'
+    moment.locale(momentLocale)
+  }, [locale])
 
   const events = posts?.data.data.map((post) => ({
     ...post,
@@ -44,8 +57,6 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
     end: moment(post.publicationTime).toDate(),
     title: post.metadata.content
   }))
-
-  const { openCreateScheduleModal, setOpenCreateScheduleModal, setPost } = useAppContext()
 
   const handleNavigate = (newDate: Date) => {
     setDate(newDate)
@@ -58,8 +69,8 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
   const handleSelectSlot = ({ start, end }: SlotInfo) => {
     if (moment(start).isBefore(moment(), 'minute')) {
       toast({
-        title: 'Error',
-        description: 'You cannot schedule posts in the past',
+        title: t('error'),
+        description: t('pastSchedule'),
         variant: 'destructive'
       })
       return
@@ -144,6 +155,14 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
           }
           return {}
         }}
+        slotPropGetter={(date: Date) => {
+          if (moment(date).isBefore(moment(), 'minute')) {
+            return {
+              className: 'bg-muted/30 cursor-not-allowed'
+            }
+          }
+          return {}
+        }}
         eventPropGetter={(event: Event) => getCustomEventStyle(event.platform)}
         localizer={localizer}
         style={{ height: 'calc(100vh - 96px)', width: '100%' }}
@@ -161,11 +180,28 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
         }}
         dayLayoutAlgorithm='no-overlap'
         popup
+        step={15}
         messages={{
-          showMore: (count, remainingEvents, events) => {
-            return `+${count} more`
-          }
+          next: t('next'),
+          previous: t('previous'),
+          today: t('today'),
+          month: t('month'),
+          week: t('week'),
+
+          day: t('day'),
+          agenda: t('agenda'),
+          date: t('date'),
+          time: t('time'),
+
+          event: t('event'),
+          noEventsInRange: t('noEventsInRange'),
+          showMore: (total) => t('showMore', { total }),
+          allDay: t('allDay'),
+          tomorrow: t('tomorrow'),
+          yesterday: t('yesterday'),
+          work_week: t('workWeek')
         }}
+        longPressThreshold={0}
       />
 
       <CreatePostModal

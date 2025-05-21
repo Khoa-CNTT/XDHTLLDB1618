@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction, useEffect } from 'react'
 import { genAISettingSchema, GenAISettingSchema } from '@/schema-validations/genAI'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 
 import { Button } from '../ui/button'
@@ -16,26 +17,27 @@ interface Props {
 }
 
 export default function AiSetting({ setStep, setSettings, currentSettings }: Props) {
+  const t = useTranslations('createPostModal')
   const TONE_OPTIONS = [
     {
       value: 'funny',
-      label: '🤣 Funny'
+      label: `🤣 ${t('funny')}`
     },
     {
       value: 'friendly',
-      label: '😁 Friendly'
+      label: `😁 ${t('friendly')}`
     },
     {
       value: 'professional',
-      label: '💼 Professional'
+      label: `💼 ${t('professional')}`
     },
     {
       value: 'enthusiastic',
-      label: '🎉 Enthusiastic'
+      label: `🎉 ${t('enthusiastic')}`
     },
     {
       value: 'informative',
-      label: '📔 Informative'
+      label: `📔 ${t('informative')}`
     }
   ]
   const form = useForm<GenAISettingSchema>({
@@ -73,7 +75,7 @@ export default function AiSetting({ setStep, setSettings, currentSettings }: Pro
             name='tone'
             render={({ field }) => (
               <FormItem>
-                <FormLabel className='mb-2 text-md font-bold'>Tone</FormLabel>
+                <FormLabel className='mb-2 text-md font-bold'>{t('tone')}</FormLabel>
                 <FormControl>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger className='w-[180px]'>
@@ -100,7 +102,7 @@ export default function AiSetting({ setStep, setSettings, currentSettings }: Pro
             name='isUseEmoji'
             render={({ field }) => (
               <FormItem className='flex flex-col'>
-                <FormLabel className='mb-2 text-md font-bold'>Use Emoji</FormLabel>
+                <FormLabel className='mb-2 text-md font-bold'>{t('useEmoji')}</FormLabel>
                 <FormControl>
                   <Switch checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
@@ -112,7 +114,7 @@ export default function AiSetting({ setStep, setSettings, currentSettings }: Pro
             name='isUseHashtags'
             render={({ field }) => (
               <FormItem className='flex flex-col'>
-                <FormLabel className='mb-2 text-md font-bold'>Use Hashtags</FormLabel>
+                <FormLabel className='mb-2 text-md font-bold'>{t('useHashtag')}</FormLabel>
                 <FormControl>
                   <Switch checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
@@ -125,15 +127,15 @@ export default function AiSetting({ setStep, setSettings, currentSettings }: Pro
           name='responseFormat'
           render={({ field }) => (
             <FormItem className='flex flex-col'>
-              <FormLabel className='mb-2 text-md font-bold'>How would you like AI Assistant to respond?</FormLabel>
+              <FormLabel className='mb-2 text-md font-bold'>{t('howAiRespond')}</FormLabel>
               <FormControl>
-                <Input {...field} placeholder='e.g. write in the first person, respond as a pirate, etc.' />
+                <Input {...field} placeholder={t('exampleResponse')} />
               </FormControl>
             </FormItem>
           )}
         />
         <Button type='submit' className='block ml-auto'>
-          Save settings
+          {t('saveSettings')}
         </Button>
       </form>
     </Form>
