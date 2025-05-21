@@ -2,7 +2,18 @@ import { Request, Response } from 'express'
 import { HTTP_STATUS_CODE } from '~/constants/httpStatusCode'
 import postServices from '~/services/posts.services'
 import { ParamsDictionary } from 'express-serve-static-core'
-import { CreatePostRequestBody, GetPostDetailsParams, GetPostQuery } from '~/models/request/posts.request'
+import {
+  CreatePostRequestBody,
+  DeletePostParams,
+  DeleteRecurringPostParams,
+  GetPostDetailsParams,
+  GetPostQuery,
+  UpdatePostParams,
+  UpdatePostRequestBody,
+  UpdateRecurringPostInstancesParams,
+  UpdateRecurringPostParams,
+  UpdateRecurringPostRequestBody
+} from '~/models/request/posts.request'
 import { addPostToScheduleQueue } from '~/services/queue.services'
 
 export const getPostsController = async (req: Request<ParamsDictionary, any, any, GetPostQuery>, res: Response) => {
@@ -40,5 +51,31 @@ export const getPostDetailsController = async (req: Request<GetPostDetailsParams
   res.status(HTTP_STATUS_CODE.OK).json({
     data: result,
     message: 'Get post details successfully'
+  })
+}
+
+export const updatePostController = async (
+  req: Request<UpdatePostParams, any, UpdatePostRequestBody>,
+  res: Response
+) => {
+  const postId = req.params.id
+  const body = req.body
+
+  // update post
+  await postServices.updatePost(postId, body)
+
+  res.status(HTTP_STATUS_CODE.OK).json({
+    message: 'Update post successfully'
+  })
+}
+
+export const deletePostController = async (req: Request<DeletePostParams>, res: Response) => {
+  const postId = req.params.id
+
+  // delete post
+  await postServices.deletePost(postId)
+
+  res.status(HTTP_STATUS_CODE.OK).json({
+    message: 'Delete post successfully'
   })
 }

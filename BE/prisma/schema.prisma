@@ -17,11 +17,14 @@ datasource db {
 model User {
   id           String    @id // ID from Clerk
   email        String    @unique
+  password     String?
   firstName    String?
   lastName     String?
   imageUrl     String?
   username     String?   @unique
   lastSignInAt DateTime?
+  roles              String[]
+  permissions        String[]
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -73,6 +76,7 @@ model SocialCredential {
   platform      String
   credentials   Json
   metadata      Json
+  is_disconnected Boolean @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   userId        String
@@ -80,7 +84,6 @@ model SocialCredential {
 
   Post Post[]
   RecurringPost RecurringPost[]
-
 
   @@unique([userId, socialId])
   @@map("social_credentials")
@@ -101,8 +104,25 @@ model RecurringPost {
   nextScheduledDate  DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+  skipDates          DateTime[] 
 
   posts Post[] // Posts created from this recurring post
 
   @@map("recurring_posts")
+  RecurringPostInstance RecurringPostInstance[]
+}
+
+model RecurringPostInstance {
+  id               String   @id @default(uuid())
+  recurringPostId  String
+  publicationTime    DateTime
+  metadata         Json
+  status           String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  recurringPost    RecurringPost @relation(fields: [recurringPostId], references: [id])
+
+  @@unique([recurringPostId, publicationTime])
+  @@map("recurring_post_instances")
 }

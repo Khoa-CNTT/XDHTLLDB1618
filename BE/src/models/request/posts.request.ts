@@ -28,6 +28,18 @@ export interface CreatePostRequestBody {
   }[]
 }
 
+export interface UpdatePostRequestBody {
+  publicationTime: string
+  metadata: {
+    type: string
+    content: string
+    assets: {
+      type: string
+      url: string
+    }[]
+    [key: string]: any
+  }
+}
 export interface GetPostQuery extends ParsedQs {
   platform?: string
 }
@@ -35,6 +47,9 @@ export interface GetPostQuery extends ParsedQs {
 export interface GetPostDetailsParams extends ParamsDictionary {
   id: string
 }
+
+export type DeletePostParams = GetPostDetailsParams
+export type UpdatePostParams = GetPostDetailsParams
 
 export interface PostResponse {
   id: string
@@ -46,4 +61,29 @@ export interface PostResponse {
   progress?: number
   createdAt: Date
   updatedAt: Date
+}
+
+export interface UpdateRecurringPostParams extends ParamsDictionary {
+  recurringId: string
+}
+
+export interface UpdateRecurringPostInstancesParams extends ParamsDictionary {
+  recurringId: string
+  instanceId: string
+}
+
+export type UpdateRecurringPostRequestBody = UpdatePostRequestBody & {
+  recurring: {
+    frequency: 'daily' | 'weekly'
+    daysOfWeek?: number[]
+    startDate: string
+    endDate: string
+  }
+  postId?: string
+}
+
+export type DeleteRecurringPostParams = UpdateRecurringPostParams
+
+export interface DeleteRecurringPostQuery extends ParsedQs {
+  publicationTime: string
 }

@@ -1,4 +1,8 @@
-import { CreatePostRequestBody } from '~/models/request/posts.request'
+import {
+  CreatePostRequestBody,
+  UpdatePostRequestBody,
+  UpdateRecurringPostRequestBody
+} from '~/models/request/posts.request'
 import database from './database.services'
 import { uploadImageFb, publishPostFb, getFbEngagement } from '~/helpers/facebook'
 import { ErrorWithStatus } from '~/models/errors'
@@ -22,12 +26,13 @@ import {
 import { platformHandlers } from '~/helpers'
 import { addPostToScheduleQueue } from './queue.services'
 import moment from 'moment'
+import { sendPostNotification } from '~/helpers/telegram'
 
 class PostServices {
   async getPosts(userId: string, platform?: string) {
     // First, get all social credentials for the user
     const userCredentials = await database.socialCredential.findMany({
-      where: { userId },
+      where: { userId, is_disconnected: false },
       select: { id: true }
     })
 
@@ -39,7 +44,10 @@ class PostServices {
           socialCredentialID: {
             in: credentialIds
           },
-          platform
+          platform,
+          socialCredential: {
+            is_disconnected: false
+          }
         },
         include: {
           socialCredential: {
@@ -57,7 +65,10 @@ class PostServices {
             in: credentialIds
           },
           status: 'active',
-          platform
+          platform,
+          socialCredential: {
+            is_disconnected: false
+          }
         },
         include: {
           socialCredential: {
@@ -126,9 +137,31 @@ class PostServices {
         const dateStr = date.toISOString().split('T')[0]
         const scheduledDates = recurringPostScheduledDates.get(recurringPost.id) || new Set()
 
-        // Skip if this specific date is already scheduled
-        if (scheduledDates.has(dateStr)) {
+        // Skip if this specific date is already scheduled or if it's in the skipDates array
+        if (
+          scheduledDates.has(dateStr) ||
+          (recurringPost.skipDates && recurringPost.skipDates.some((d) => new Date(d).getTime() === date.getTime()))
+        ) {
           continue
+        }
+
+        const instance = await database.recurringPostInstance.findFirst({
+          where: {
+            recurringPostId: recurringPost.id,
+            publicationTime: date
+          }
+        })
+
+        let metadata = {
+          ...(recurringPost.metadata as any),
+          virtualId: `recurring-${recurringPost.id}-${date.toISOString()}`
+        }
+        if (instance) {
+          metadata = {
+            ...metadata,
+            ...(instance.metadata as any),
+            instanceId: instance.id
+          }
         }
 
         // Create a virtual post object
@@ -138,14 +171,12 @@ class PostServices {
           publicationTime: date.toISOString(),
           platform: recurringPost.platform,
           socialCredentialID: recurringPost.socialCredentialID,
-          metadata: {
-            ...(recurringPost.metadata as any),
-            virtualId: `recurring-${recurringPost.id}-${date.toISOString()}`
-          },
+          metadata,
           recurringPostId: recurringPost.id,
           socialCredential: {
             metadata: recurringPost.socialCredential.metadata
-          }
+          },
+          recurringPost
         }
 
         virtualPosts.push(virtualPost)
@@ -179,7 +210,7 @@ class PostServices {
     recurringPostId?: string
   }) {
     const credential = await database.socialCredential.findUnique({
-      where: { id: post.socialCredentialID },
+      where: { id: post.socialCredentialID, is_disconnected: false },
       select: { credentials: true }
     })
 
@@ -307,7 +338,10 @@ class PostServices {
   async getPostDetails(postId: string) {
     const post = await database.post.findUnique({
       where: {
-        id: postId
+        id: postId,
+        socialCredential: {
+          is_disconnected: false
+        }
       },
       include: {
         socialCredential: {
@@ -456,9 +490,15 @@ class PostServices {
       creation_id?: string
       media_ids?: string[]
     }
+    telegramId: string | null
+    socialCredential: {
+      metadata: {
+        name: string
+      }
+    }
   }) {
     const credential = await database.socialCredential.findUnique({
-      where: { id: post.socialCredentialID },
+      where: { id: post.socialCredentialID, is_disconnected: false },
       select: { credentials: true }
     })
 
@@ -473,8 +513,32 @@ class PostServices {
     if (post.platform === Platform.X) {
       credentials.socialCredentialID = post.socialCredentialID
     }
+    const userTelegramId = post.telegramId
+    if (userTelegramId) {
+      await sendPostNotification({
+        telegramId: userTelegramId,
+        status: 'start',
+        postId: post.id,
+        platform: post.platform,
+        author: post.socialCredential.metadata.name,
+        message: 'Starting to publish post'
+      })
+    }
 
     const result = await platformHandlers[post.platform.toLowerCase()](post.metadata, credentials)
+
+    if (result) {
+      if (userTelegramId) {
+        await sendPostNotification({
+          telegramId: userTelegramId,
+          status: 'success',
+          postId: post.id,
+          platform: post.platform,
+          author: post.socialCredential.metadata.name,
+          message: `Published with ID: ${result}`
+        })
+      }
+    }
 
     // update post with status PUBLISHED and postId
     const updatedPost = await database.post.update({
@@ -503,6 +567,9 @@ class PostServices {
         status: 'scheduled',
         publicationTime: {
           lte: now
+        },
+        socialCredential: {
+          is_disconnected: false
         }
       }
     })
@@ -513,7 +580,10 @@ class PostServices {
     const now = new Date()
     const activePosts = await database.post.findMany({
       where: {
-        status: 'active'
+        status: 'active',
+        socialCredential: {
+          is_disconnected: false
+        }
       }
     })
 
@@ -531,6 +601,28 @@ class PostServices {
     )
 
     return activePosts
+  }
+
+  async updatePost(postId: string, body: UpdatePostRequestBody) {
+    const updatedPost = await database.post.update({
+      where: { id: postId },
+      data: {
+        ...body,
+        updatedAt: new Date()
+      }
+    })
+
+    await addPostToScheduleQueue(updatedPost as any)
+
+    return updatedPost
+  }
+
+  async deletePost(postId: string) {
+    const deletedPost = await database.post.delete({
+      where: { id: postId }
+    })
+
+    return deletedPost
   }
 }
 
